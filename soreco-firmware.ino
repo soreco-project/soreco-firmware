@@ -4,6 +4,7 @@
  ****************************************************/
 
 #include "Arduino.h"
+#include "SonosDiscovery.h"
 
 const char FIRMWARE_VERSION[]="0.0.1";
 
