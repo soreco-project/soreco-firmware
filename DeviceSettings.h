@@ -25,13 +25,13 @@ public:
             uint32_t flags;
         };
         char deviceName[32+1] = "";
-        // upper threshold the volume can be set (e.g. as a child lock)
+        // upper threshold for volume
         uint8_t maxVolume;
         // timeout in minutes when device should go to deep sleep after last user interaction
         uint16_t deepSleepTimeout;
     };
     
-    struct WiFiSettings {
+    struct WiFiConfig {
         union ConfigFlags {
             struct {
                 bool dhcpActive : 1;
@@ -84,13 +84,13 @@ public:
     /**
      * Get the stored WiFi settings.
      */
-    static WiFiSettings getWiFiSettings(void);
+    static WiFiConfig getWiFiConfig(void);
 
     /**
      * Set the WiFi settings.
      * Note: save() has to be called in order to persist the data
      */
-    static void setWiFiSettings(const WiFiSettings& settings);
+    static void setWiFiConfig(const WiFiConfig& settings);
 
 private:
     /**
@@ -114,9 +114,9 @@ private:
      */
     struct EepromLayoutV1 {
         // maximum EEPROM size is limited to 4096 bytes!
-        uint8_t layoutVersion;
+        uint8_t layoutVersion = EEPROM_LAYOUT_VERSION_V1;
         DeviceParameters deviceParameters;
-        WiFiSettings wifiSettings;
+        WiFiConfig wifiConfig;
         char sonosDeviceName[32+1] = "";
         PresetConfig preset1;
         PresetConfig preset2;

@@ -28,14 +28,14 @@ void DeviceSettings::save(void) {
     EEPROM.commit();
 }
 
-DeviceSettings::WiFiSettings DeviceSettings::getWiFiSettings(void) {
-    WiFiSettings eepromValues;
-    size_t offset = offsetof(struct EepromLayoutV1, wifiSettings);
+DeviceSettings::WiFiConfig DeviceSettings::getWiFiConfig(void) {
+    WiFiConfig eepromValues;
+    size_t offset = offsetof(struct EepromLayoutV1, wifiConfig);
     EEPROM.get(offset, eepromValues);
     return eepromValues;
 }
 
-void DeviceSettings::setWiFiSettings(const WiFiSettings& settings) {
-    size_t offset = offsetof(struct EepromLayoutV1, wifiSettings);
+void DeviceSettings::setWiFiConfig(const WiFiConfig& settings) {
+    size_t offset = offsetof(struct EepromLayoutV1, wifiConfig);
     EEPROM.put(offset, settings);
 }
