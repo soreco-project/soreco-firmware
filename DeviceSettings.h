@@ -42,7 +42,7 @@ public:
         // max SSID length is 32 characters, reserve 1 additional byte for string null termination
         char ssid[32+1] = "";
         // max passphrase length for WPA-PSK is 63 characters
-        char passphrases[63+1] = "";
+        char passphrase[63+1] = "";
 
         struct IpConfig {
             uint32_t address;
