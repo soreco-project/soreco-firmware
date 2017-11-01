@@ -7,7 +7,11 @@
 #define DEVICESETTINGS_H
 
 #include <stdint.h>
+#include <stddef.h>
 
+/**
+ * Note: save() has to be called in order to persist the data
+ */
 class DeviceSettings {
 public:
 
@@ -24,11 +28,17 @@ public:
             };
             uint32_t flags;
         };
+        // name of soreco
         char deviceName[32+1] = "";
         // upper threshold for volume
         uint8_t maxVolume;
         // timeout in minutes when device should go to deep sleep after last user interaction
         uint16_t deepSleepTimeout;
+    };
+
+    struct SonosConfig {
+        // sonos device to control
+        char sonosDeviceName[32+1] = "";
     };
     
     struct WiFiConfig {
@@ -81,16 +91,20 @@ public:
      */
     static void save(void);
 
-    /**
-     * Get the stored WiFi settings.
-     */
-    static WiFiConfig getWiFiConfig(void);
+    static DeviceParameters getDeviceParameters(void);
+    static void setDeviceParameters(const DeviceParameters& param);
 
-    /**
-     * Set the WiFi settings.
-     * Note: save() has to be called in order to persist the data
-     */
-    static void setWiFiConfig(const WiFiConfig& settings);
+    static DeviceConfig getDeviceConfig(void);
+    static void setDeviceConfig(const DeviceConfig& param);
+
+    static SonosConfig getSonosConfig(void);
+    static void setSonosConfig(const SonosConfig& param);
+
+    static WiFiConfig getWiFiConfig(void);
+    static void setWiFiConfig(const WiFiConfig& param);
+
+    static PresetConfig getPresetConfig(uint8_t index);
+    static void setPresetConfig(uint8_t index, const PresetConfig& param);
 
 private:
     /**
@@ -109,6 +123,12 @@ private:
     DeviceSettings& operator=(const DeviceSettings&);
 
     /**
+     * Calculates the offset in bytes for the given preset configuration within the EEPROM layout structure.
+     * @param index - index of preset (0..3)
+     */
+    static size_t getPresetConfigOffset(uint8_t index);
+
+    /**
      * ESP8266 needs 4 byte alignment since it emulates EEPROM in flash.
      * Note: sizeof() and offsetof(type, member) will calculate offsets taking alignment rules into account.
      */
@@ -116,8 +136,9 @@ private:
         // maximum EEPROM size is limited to 4096 bytes!
         uint8_t layoutVersion = EEPROM_LAYOUT_VERSION_V1;
         DeviceParameters deviceParameters;
+        DeviceConfig deviceConfig;
+        SonosConfig sonosConfig;
         WiFiConfig wifiConfig;
-        char sonosDeviceName[32+1] = "";
         PresetConfig preset1;
         PresetConfig preset2;
         PresetConfig preset3;
