@@ -1,2 +1,2 @@
-# s-control-firmware
-S-Control Firmware
+# soreco-firmware
+Firmware for soreco Sonos Remote Control.
