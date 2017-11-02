@@ -21,8 +21,8 @@ install:
   #- git clone https://github.com/squix78/esp8266-oled-ssd1306 /usr/local/share/arduino/libraries/esp8266-oled-ssd1306
   
 script:
-#compile the code, example:
- - arduino --verify --board $BD $PWD/soreco-firmware/soreco-firmware.ino
+#compile the code
+ - arduino --verify --board $BD $PWD/soreco-firmware.ino
 
 notifications:
   email:
