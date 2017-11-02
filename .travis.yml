@@ -22,7 +22,7 @@ install:
   
 script:
 #compile the code, example:
-# - arduino --verify --board $BD $PWD/path_to_the_file/file.ino
+ - arduino --verify --board $BD $PWD/soreco-firmware/soreco-firmware.ino
 
 notifications:
   email:
