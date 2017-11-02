@@ -1,8 +1,3 @@
-/*************************************************** 
- Persistent storage of device settings.
- Built for future extensibility across multiple software updates with layout versioning system. 
- ****************************************************/
-
 #ifndef DEVICESETTINGS_H
 #define DEVICESETTINGS_H
 
@@ -10,6 +5,8 @@
 #include <stddef.h>
 
 /**
+ * Persistent storage of device settings.
+ * Built for future extensibility across multiple software updates with layout versioning system. 
  * Note: save() has to be called in order to persist the data
  */
 class DeviceSettings {
