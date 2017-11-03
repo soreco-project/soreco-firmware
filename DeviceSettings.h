@@ -12,10 +12,16 @@
 class DeviceSettings {
 public:
 
+    /**
+     * Device parameters characterize the behavior of the device and are programmed in production.
+     */
     struct DeviceParameters {
         uint32_t deviceSerialNumber;
     };
 
+    /**
+     * Device configuration contains the user settings which are persistent across reboots.
+     */
     struct DeviceConfig {
         union ConfigFlags {
             struct {
@@ -33,11 +39,17 @@ public:
         uint16_t deepSleepTimeout;
     };
 
+    /**
+     * Sonos configuration specifically for Sonos which are persistent across reboots.
+     */
     struct SonosConfig {
         // sonos device to control
         char sonosDeviceName[32+1] = "";
     };
     
+    /**
+     * WiFi configuration contain the connectivity settings which are persistent across reboots.
+     */
     struct WiFiConfig {
         union ConfigFlags {
             struct {
@@ -60,6 +72,9 @@ public:
         IpConfig fixedIpConfig;
     };
 
+    /**
+     * Preset configuration contain the actions which are individually programmed on the preset buttons.
+     */
     struct PresetConfig {
         struct Action {
             enum ActionType {
@@ -104,10 +119,11 @@ public:
     static void setPresetConfig(uint8_t index, const PresetConfig& param);
 
 private:
+
     /**
     * Default constructor.
     */
-    DeviceSettings(void);    
+    DeviceSettings(void);
 
     /**
      * Private copy constructor.
