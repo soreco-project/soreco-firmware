@@ -16,9 +16,14 @@ public:
     const char* PASSWORD = "12345678";
 
     /**
-    * Default constructor.
-    */
+     * Default constructor.
+     */
     WifiManager(void);    
+
+    /**
+     * Deconstructor.
+     */
+    ~WifiManager(void);    
 
     /**
      * set ESP8266 into pairing mode so an external can join to access point. 
@@ -26,7 +31,7 @@ public:
     void startServiceMode();
 
     /**
-     * Scan
+     * Scan and print all networks that available.
      */
     void scanForNetworks(void);
 

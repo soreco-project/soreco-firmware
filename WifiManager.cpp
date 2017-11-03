@@ -11,6 +11,9 @@ WifiManager::WifiManager(void) :
     m_server(WifiManager::PORT) {
 }
 
+WifiManager::~WifiManager(void) {
+}
+
 void WifiManager::startServiceMode(void) {
     // disconnect wifi from an AP
     WiFi.disconnect();
