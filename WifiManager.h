@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include "ESP8266WiFi.h"
-#include <WiFiClient.h> 
 
 /**
  * Wifi manager to handle all interaction with the wifi module.
