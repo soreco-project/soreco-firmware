@@ -39,12 +39,12 @@ private:
     /**
     * Private copy constructor.
     */
-   DeviceSettings(const DeviceSettings&);
+    SerialCommands(const SerialCommands&);
 
     /**
     * Private assignment constructor.
     */
-   DeviceSettings& operator=(const DeviceSettings&);
+    SerialCommands& operator=(const SerialCommands&);
 
     void clearBuffer(void);
     

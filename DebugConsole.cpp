@@ -11,12 +11,12 @@ void cmdHelp(void) {
     serialCommands.listCommands();
 }
 
-void cmdSerialNumberGet(void) {
+void cmdConfigSerialNumberGet(void) {
     DeviceSettings::DeviceParameters params = DeviceSettings::getDeviceParameters();
     Serial.println(params.deviceSerialNumber);
 }
 
-void cmdSerialNumberSet(void) {
+void cmdConfigSerialNumberSet(void) {
     DeviceSettings::DeviceParameters params;
     char* argument = serialCommands.getArgument();
     if (argument != NULL) {
@@ -28,8 +28,16 @@ void cmdSerialNumberSet(void) {
     }
 }
 
-void cmdEepromSave(void) {
+void cmdConfigSave(void) {
     DeviceSettings::save();
+}
+
+void cmdConfigClearAll(void) {
+    DeviceSettings::clearAll();
+}
+
+void cmdConfigFactoryDefaults(void) {
+    DeviceSettings::factoryDefaults();
 }
 
 DebugConsole::DebugConsole(void) {
@@ -40,9 +48,11 @@ DebugConsole::~DebugConsole(void) {
 
 void DebugConsole::setup(void) {
     serialCommands.addCommand("help", cmdHelp);
-    serialCommands.addCommand("Config.SerialNumber.Get", cmdSerialNumberGet);
-    serialCommands.addCommand("Config.SerialNumber.Set", cmdSerialNumberSet);
-    serialCommands.addCommand("Config.Save", cmdEepromSave);
+    serialCommands.addCommand("Config.SerialNumber.Get", cmdConfigSerialNumberGet);
+    serialCommands.addCommand("Config.SerialNumber.Set", cmdConfigSerialNumberSet);
+    serialCommands.addCommand("Config.Save", cmdConfigSave);
+    serialCommands.addCommand("Config.ClearAll", cmdConfigClearAll);
+    serialCommands.addCommand("Config.FactoryDefaults", cmdConfigFactoryDefaults);
 }
 
 void DebugConsole::loop(void) {
