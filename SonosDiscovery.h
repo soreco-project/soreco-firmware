@@ -8,7 +8,7 @@
 #include <vector>
 #include "SonosDevice.h"
 
-class SonosDisovery {
+class SonosDiscovery {
 public:
 
     /**
@@ -22,17 +22,17 @@ private:
     /**
      * Private default constructor.
      */
-    SonosDisovery(void);
+    SonosDiscovery(void);
     
     /**
      * Private copy constructor.
      */
-    SonosDisovery(const SonosDisovery&);
+    SonosDiscovery(const SonosDiscovery&);
 
     /**
      * Private assignment constructor.
      */
-    SonosDisovery& operator=(const SonosDisovery&);
+    SonosDiscovery& operator=(const SonosDiscovery&);
 };
 
 #endif // SONOSDISCOVERY_H
