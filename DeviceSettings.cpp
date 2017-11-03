@@ -25,6 +25,20 @@ void DeviceSettings::save(void) {
     EEPROM.commit();
 }
 
+void DeviceSettings::clearAll(void) {
+    for (int i = 0; i < 4096; i++) {
+        EEPROM.write(i, 0);
+    }
+    save();
+}
+
+void DeviceSettings::factoryDefaults(void) {
+    DeviceParameters parameters = getDeviceParameters();
+    clearAll();
+    setDeviceParameters(parameters);
+    save();
+}
+
 DeviceSettings::DeviceParameters DeviceSettings::getDeviceParameters(void) {
     DeviceParameters eepromValues;
     size_t offset = offsetof(struct EepromLayoutV1, deviceParameters);

@@ -103,6 +103,16 @@ public:
      */
     static void save(void);
 
+    /**
+     * Erase entire content and initialize with 0.
+     */
+    static void clearAll(void);
+
+    /**
+     * Reset all configuration (except DeviceParameters) to factory defaults. 
+     */
+    static void factoryDefaults(void);
+
     static DeviceParameters getDeviceParameters(void);
     static void setDeviceParameters(const DeviceParameters& param);
 
