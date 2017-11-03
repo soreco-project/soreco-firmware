@@ -8,4 +8,4 @@ soreco is a hardware remote controller for Sonos wireless home sound system, whi
 [Link to the Trello](https://trello.com/b/eYdj9IFY/firmware)
 
 ## Special Thanks
-Special Thanks to [Valentin](https://github.com/vmichalak) for is work on the [sonos-controller](https://github.com/vmichalak/sonos-controller) Android library, which served as a basis for the Arduino implementation.
+Special Thanks to [Valentin](https://github.com/vmichalak) for his work on the [sonos-controller](https://github.com/vmichalak/sonos-controller) Android library, which served as a basis for the Arduino implementation.
