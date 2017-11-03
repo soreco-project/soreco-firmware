@@ -1,7 +1,7 @@
-/*************************************************** 
- Firmware of soreco Sonos Remote Control.
- Note: based on Arduino and ESP8266
- ****************************************************/
+/************************************************************************************************** 
+ Firmware of soreco Sonos Remote Control based on Arduino and ESP8266.
+ This is the entry point for Arduino applications (also known as sketch).
+ *************************************************************************************************/
 
 #include "Arduino.h"
 #include "DebugConsole.h"

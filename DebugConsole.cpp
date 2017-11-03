@@ -12,14 +12,14 @@ void cmdHelp(void) {
 }
 
 void cmdSerialNumberGet(void) {
-	DeviceSettings::DeviceParameters params = DeviceSettings::getDeviceParameters();
-	Serial.println(params.deviceSerialNumber);
+    DeviceSettings::DeviceParameters params = DeviceSettings::getDeviceParameters();
+    Serial.println(params.deviceSerialNumber);
 }
 
 void cmdSerialNumberSet(void) {
-	DeviceSettings::DeviceParameters params;
-	char* argument = serialCommands.getArgument();
-	if (argument != NULL) {
+    DeviceSettings::DeviceParameters params;
+    char* argument = serialCommands.getArgument();
+    if (argument != NULL) {
         params.deviceSerialNumber = atoi(argument);
         DeviceSettings::setDeviceParameters(params);
     }
@@ -29,17 +29,20 @@ void cmdSerialNumberSet(void) {
 }
 
 void cmdEepromSave(void) {
-	DeviceSettings::save();
+    DeviceSettings::save();
 }
 
 DebugConsole::DebugConsole(void) {
 }
 
+DebugConsole::~DebugConsole(void) {
+}
+
 void DebugConsole::setup(void) {
     serialCommands.addCommand("help", cmdHelp);
     serialCommands.addCommand("Config.SerialNumber.Get", cmdSerialNumberGet);
-	serialCommands.addCommand("Config.SerialNumber.Set", cmdSerialNumberSet);
-	serialCommands.addCommand("Config.Save", cmdEepromSave);
+    serialCommands.addCommand("Config.SerialNumber.Set", cmdSerialNumberSet);
+    serialCommands.addCommand("Config.Save", cmdEepromSave);
 }
 
 void DebugConsole::loop(void) {

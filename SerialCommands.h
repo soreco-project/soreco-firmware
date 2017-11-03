@@ -4,21 +4,28 @@
 #include <stdint.h>
 
 /**
- * Allows a simple command line interface to be implemented with function callbacks.
+ * SerialCommands provides a simple command line interface with callbacks for each command.
+ * Once the line terminator is received, the buffered characters are processed and the registered callback is invoked.
  */
 class SerialCommands {
 public:
+    
     /**
     * Default constructor.
     */
     SerialCommands(void);
 
-	/**
+    /**
+     * Destructor.
+     */
+    ~SerialCommands(void);
+
+    /**
     * One time configuration.
     */
-	void setup(void);
-	
-	/**
+    void setup(void);
+    
+    /**
     * Process console input.
     */
     void loop(void);
@@ -26,25 +33,35 @@ public:
     void addCommand(const char*, void(*)());
     char* getArgument(void);
     void listCommands(void);
-	
+    
 private:
 
-	void clearBuffer(void);
-	
+    /**
+    * Private copy constructor.
+    */
+   DeviceSettings(const DeviceSettings&);
+
+    /**
+    * Private assignment constructor.
+    */
+   DeviceSettings& operator=(const DeviceSettings&);
+
+    void clearBuffer(void);
+    
     static const uint8_t MAX_COMMAND_LENGTH = 32;
     static const uint8_t MAX_COMMANDS = 32;
     const char* COMMAND_DELIMITER = " ";
     const char COMMAND_TERMINATOR = '\n';
 
-	// Data structure to hold Command/Handler function key-value pairs                      
+    // Data structure to hold Command/Handler function key-value pairs                      
     struct SerialCommandsCallback {
         char command[MAX_COMMAND_LENGTH];
         void (*function)(void);
     };
 
     // buffer for characters until terminator received
-	char m_buffer[MAX_COMMAND_LENGTH];
-	char* m_argumentSavePtr;
+    char m_buffer[MAX_COMMAND_LENGTH];
+    char* m_argumentSavePtr;
     uint8_t m_bufferPos;                        
     uint8_t m_numberOfCommands;
     SerialCommandsCallback m_commands[MAX_COMMANDS];   

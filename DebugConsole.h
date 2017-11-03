@@ -6,10 +6,16 @@
  */
 class DebugConsole {
 public:
+
     /**
     * Default constructor.
     */
     DebugConsole(void);
+
+    /**
+    * Destructor.
+    */
+    ~DebugConsole(void);
 
     /**
     * Register console commands.
@@ -20,6 +26,18 @@ public:
     * Process console input.
     */
     void loop(void);
+
+private:
+
+    /**
+    * Private copy constructor.
+    */
+    DebugConsole(const DebugConsole&);
+   
+    /**
+    * Private assignment constructor.
+    */
+    DebugConsole& operator=(const DebugConsole&);
 };
 
 #endif //DEBUGCONSOLE_H
