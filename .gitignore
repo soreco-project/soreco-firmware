@@ -287,4 +287,6 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 .DS_Store
-.vscode/c_cpp_properties.json
+
+# VS Code
+.vscode/
