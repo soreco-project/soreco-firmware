@@ -25,7 +25,7 @@ void setup() {
 
     DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
     if (wifiConfig.isConfigured()) {
-        Serial.println("Connecting to configured WiFi");
+        Serial.print("Connecting to configured WiFi "); Serial.println(wifiConfig.ssid);
         wifiManager.startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
     }
     else {

@@ -81,11 +81,11 @@ void cmdWiFiScan(void) {
 }
 
 void cmdWiFiConnect(void) {
-    DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
-    Serial.print("Connecting to WiFi network "); Serial.print(config.ssid);
-    pWiFiManager->startClientMode(config.ssid, config.passphrase);
+    DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
+    Serial.print("Connecting to configured WiFi "); Serial.println(wifiConfig.ssid);
+    pWiFiManager->startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
 
-    int16_t timeOutMs = 5000;
+    int16_t timeOutMs = 10000;
     const int16_t delayMs = 500;
     while ((WiFi.status() != WL_CONNECTED) && (timeOutMs > 0)) {
         delay(delayMs);
@@ -100,6 +100,11 @@ void cmdWiFiConnect(void) {
     else {
         Serial.println("failed!");
     }
+}
+
+void cmdWiFiStartHotspot(void) {
+    Serial.println("Starting WiFi hotspot for configuration");
+    pWiFiManager->startConfigMode();
 }
 
 void cmdWiFiStatus(void) {
@@ -135,6 +140,7 @@ void DebugConsole::setup(WifiManager& wifiManager) {
     serialCommands.addCommand("Config.WiFi.Passphrase", cmdConfigWiFiPassphrase);
     serialCommands.addCommand("WiFi.Scan", cmdWiFiScan);
     serialCommands.addCommand("WiFi.Connect", cmdWiFiConnect);
+    serialCommands.addCommand("WiFi.StartHotspot", cmdWiFiStartHotspot);
     serialCommands.addCommand("WiFi.Status", cmdWiFiStatus);
 }
 
