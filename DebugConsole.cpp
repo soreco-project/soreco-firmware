@@ -68,7 +68,7 @@ void cmdConfigWiFiPassphrase(void) {
 }
 
 void cmdWiFiScan(void) {
-    Serial.print("Scanning networks..");
+    Serial.print("Scanning WiFi networks..");
     std::vector<WifiManager::WiFiNetwork> networks = pWiFiManager->scanForNetworks();
     Serial.print("..done! ("); Serial.print(networks.size()); Serial.println(" networks found)");
     for (int i = 0; i < networks.size(); i++) {
@@ -82,7 +82,7 @@ void cmdWiFiScan(void) {
 
 void cmdWiFiConnect(void) {
     DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
-    Serial.print("Connecting to network "); Serial.print(config.ssid);
+    Serial.print("Connecting to WiFi network "); Serial.print(config.ssid);
     pWiFiManager->startClientMode(config.ssid, config.passphrase);
 
     int16_t timeOutMs = 5000;
@@ -99,6 +99,21 @@ void cmdWiFiConnect(void) {
     }
     else {
         Serial.println("failed!");
+    }
+}
+
+void cmdWiFiStatus(void) {
+    wl_status_t wifiStatus = WiFi.status();
+    switch (wifiStatus) {
+        case WL_CONNECTED:
+            Serial.print("WiFi connected, IP address: "); Serial.println(WiFi.localIP());
+            break;
+        case WL_DISCONNECTED:
+            Serial.println("WiFi disconnected");
+            break;
+        default:
+            Serial.println(wifiStatus);
+            break;
     }
 }
 
@@ -120,6 +135,7 @@ void DebugConsole::setup(WifiManager& wifiManager) {
     serialCommands.addCommand("Config.WiFi.Passphrase", cmdConfigWiFiPassphrase);
     serialCommands.addCommand("WiFi.Scan", cmdWiFiScan);
     serialCommands.addCommand("WiFi.Connect", cmdWiFiConnect);
+    serialCommands.addCommand("WiFi.Status", cmdWiFiStatus);
 }
 
 void DebugConsole::loop(void) {

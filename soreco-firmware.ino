@@ -23,8 +23,16 @@ void setup() {
     debugConsole.setup(wifiManager);
     wifiManager.setup();
 
-    // TODO: only enter config mode when there is no stored network in DeviceSettings
-    wifiManager.startConfigMode();
+    DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
+    if (wifiConfig.isConfigured()) {
+        Serial.println("Connecting to configured WiFi");
+        wifiManager.startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
+    }
+    else {
+        // only enter config mode when there is no stored network in DeviceSettings
+        Serial.println("Starting WiFi hotspot for configuration");
+        wifiManager.startConfigMode();
+    }
 }
 
 void loop() {

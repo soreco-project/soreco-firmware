@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 /**
  * Persistent storage of device settings.
@@ -70,6 +71,10 @@ public:
             uint32_t gateway;
         };
         IpConfig fixedIpConfig;
+
+        bool isConfigured(void) {
+            return strlen(ssid) > 0;
+        }
     };
 
     /**
