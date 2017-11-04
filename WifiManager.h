@@ -32,24 +32,30 @@ public:
     ~WifiManager(void);
 
     /**
-     * Set system into hotspot mode so an external device can connect for configuration. 
+     * Setup the current WiFi manager
      */
-    void startConfigMode(void);
-
-    /**
-     * Scans and returns the available WiFi networks.
-     */
-    std::vector<WiFiNetwork> scanForNetworks(void);
-
+    void setup(void);
+    
     /**
      * handle TCP. TODO do it with irq!
      */
     void loop(void);
 
     /**
-     * Setup the current WiFi manager
+     * Set system into hotspot (access point) mode so an external device can connect for configuration. 
      */
-    void setup(void);
+    void startConfigMode(void);
+
+    /**
+     * Set system into client mode so it can connect to the given WiFi.
+     */
+    void startClientMode(char* ssid, char* passphrase);
+
+    /**
+     * Scans and returns the available WiFi networks.
+     */
+    std::vector<WiFiNetwork> scanForNetworks(void);
+
 private:
     /**
      * Private copy constructor.

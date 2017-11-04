@@ -13,6 +13,24 @@ WifiManager::WifiManager(void) :
 WifiManager::~WifiManager(void) {
 }
 
+void WifiManager::setup(void) {
+    // do not save WiFi configuration in flash, we have our own EEPROM settings for that
+    WiFi.persistent(false);
+}
+
+void WifiManager::loop(void) {
+  WiFiClient client = m_server.available();
+  // wait for a client (web browser) to connect
+  if (client) {
+        if (client.connected()) {
+            Serial.println("Connected");
+            // TODO parse data
+            // client.readBytesUntil(char terminator, char *buffer, size_t length)
+        }
+        client.stop();
+    }
+}
+
 void WifiManager::startConfigMode(void) {
     // disconnect wifi from an AP
     WiFi.disconnect();
@@ -30,6 +48,12 @@ void WifiManager::startConfigMode(void) {
     Serial.print("soreco host address: "); Serial.println(WiFi.softAPIP());
 }
 
+void WifiManager::startClientMode(char* ssid, char* passphrase) {
+    /* Explicitly set the ESP8266 to be a WiFi-client, otherwise it would try to act as both a client and an access-point */
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, passphrase);
+}
+
 std::vector<WifiManager::WiFiNetwork> WifiManager::scanForNetworks(void) {
     std::vector<WiFiNetwork> networkList;
     int networksFound = WiFi.scanNetworks();
@@ -41,22 +65,4 @@ std::vector<WifiManager::WiFiNetwork> WifiManager::scanForNetworks(void) {
         networkList.push_back(network);
     }
     return networkList;
-}
-
-void WifiManager::setup(void) {
-    // do not save WiFi configuration in flash, we have our own EEPROM settings for that
-    WiFi.persistent(false);
-}
-
-void WifiManager::loop(void) {
-  WiFiClient client = m_server.available();
-  // wait for a client (web browser) to connect
-  if (client) {
-        if (client.connected()) {
-            Serial.println("Connected");
-            // TODO parse data
-            // client.readBytesUntil(char terminator, char *buffer, size_t length)
-        }
-        client.stop();
-    }
 }
