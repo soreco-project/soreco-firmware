@@ -114,7 +114,7 @@ public:
     static void clearAll(void);
 
     /**
-     * Reset all configuration (except DeviceParameters) to factory defaults. 
+     * Reset all configuration (except DeviceParameters) to factory defaults.
      */
     static void factoryDefaults(void);
 
