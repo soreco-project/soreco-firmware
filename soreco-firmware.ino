@@ -20,9 +20,11 @@ void setup() {
     Serial.print("ESP8266 SDK: "); Serial.println(ESP.getSdkVersion());
 
     DeviceSettings::load();
-    debugConsole.setup();
+    debugConsole.setup(wifiManager);
     wifiManager.setup();
-    wifiManager.startServiceMode();
+
+    // TODO: only enter config mode when there is no stored network in DeviceSettings
+    wifiManager.startConfigMode();
 }
 
 void loop() {

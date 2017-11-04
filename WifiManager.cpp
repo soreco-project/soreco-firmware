@@ -1,11 +1,10 @@
 #include <Arduino.h>
 #include "WifiManager.h"
-
+#include "DeviceSettings.h"
 
 const IPAddress localIp(192, 168, 4, 1);
 const IPAddress gateway(192, 168, 4, 1);
 const IPAddress subnet(255, 255, 255, 0);
-
 
 WifiManager::WifiManager(void) :
     m_server(WifiManager::PORT) {
@@ -14,48 +13,34 @@ WifiManager::WifiManager(void) :
 WifiManager::~WifiManager(void) {
 }
 
-void WifiManager::startServiceMode(void) {
+void WifiManager::startConfigMode(void) {
     // disconnect wifi from an AP
     WiFi.disconnect();
 
-    WiFi.mode(WIFI_AP);    
+    WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(localIp, gateway, subnet);
-    // start accesspoint with ssid and password on channel 1
-    WiFi.softAP(SSID, PASSWORD, 1, SSID_HIDDEN);
+    
+    // start config hotspot with device serial number as ssid and password on channel 1
+    char ssid[32+1];
+    memcpy(ssid, CONFIG_SSID_PREFIX, strlen(CONFIG_SSID_PREFIX));
+    itoa(DeviceSettings::getDeviceParameters().deviceSerialNumber, &ssid[strlen(CONFIG_SSID_PREFIX)], 10);
+    WiFi.softAP(ssid, CONFIG_PASSWORD, 1, SSID_HIDDEN);
     
     Serial.println("AP started...");
-    Serial.print("Soreco host address: "); Serial.println(WiFi.softAPIP());
+    Serial.print("soreco host address: "); Serial.println(WiFi.softAPIP());
 }
 
-void WifiManager::scanForNetworks(void) {
-    // Set WiFi to station mode and disconnect from an AP if it was previously connected
-    WiFi.mode(WIFI_STA);
-    WiFi.disconnect();
-    delay(100);
-
-    Serial.print("Scanning networks..");
-    // WiFi.scanNetworks will return the number of networks found
+std::vector<WifiManager::WiFiNetwork> WifiManager::scanForNetworks(void) {
+    std::vector<WiFiNetwork> networkList;
     int networksFound = WiFi.scanNetworks();
-    Serial.println("..done!");
-    if (networksFound == 0) {
-        Serial.println("No WiFi networks found!");
+    for (int i = 0; i < networksFound; i++) {
+        WiFiNetwork network;
+        network.ssid = WiFi.SSID(i);
+        network.signalStrength = WiFi.RSSI(i);
+        network.encryptionType = (wl_enc_type)WiFi.encryptionType(i);
+        networkList.push_back(network);
     }
-    else {
-        Serial.print(networksFound);
-        Serial.println(" networks found:");
-        for (int i = 0; i < networksFound; ++i) {
-            // Print SSID and RSSI for each network found
-            Serial.print(i + 1);
-            Serial.print(": ");
-            Serial.print(WiFi.SSID(i));
-            Serial.print(" (");
-            Serial.print(WiFi.RSSI(i));
-            Serial.print(")");
-            Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":"*");
-            delay(10);
-        }
-    }
-    Serial.println("");
+    return networkList;
 }
 
 void WifiManager::setup(void) {

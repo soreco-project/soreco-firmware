@@ -1,6 +1,8 @@
 #ifndef DEBUGCONSOLE_H
 #define DEBUGCONSOLE_H
 
+#include "WifiManager.h"
+
 /**
  * Command line interface for development to interact with the device.
  */
@@ -20,7 +22,7 @@ public:
     /**
     * Register console commands.
     */
-    void setup(void);
+    void setup(WifiManager& wifiManager);
 
     /**
     * Process console input.

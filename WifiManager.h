@@ -2,37 +2,46 @@
 #define WIFIMANAGER_H
 
 #include <stdint.h>
+#include <vector>
 #include "ESP8266WiFi.h"
 
 /**
  * Wifi manager to handle all interaction with the wifi module.
  */
 class WifiManager {
-public:    
+public:
+
+    struct WiFiNetwork {
+        String ssid;
+        // signal strength in dBm
+        int32_t signalStrength;
+        wl_enc_type encryptionType;
+    };
+
     static const uint16_t PORT = 4000;
     static const bool SSID_HIDDEN = false;
-    const char* SSID = "ESPap";
-    const char* PASSWORD = "12345678";
+    const char* CONFIG_SSID_PREFIX = "soreco-";
+    const char* CONFIG_PASSWORD = "12345678";
 
     /**
      * Default constructor.
      */
-    WifiManager(void);    
+    WifiManager(void);
 
     /**
      * Deconstructor.
      */
-    ~WifiManager(void);    
+    ~WifiManager(void);
 
     /**
-     * set ESP8266 into pairing mode so an external can join to access point. 
+     * Set system into hotspot mode so an external device can connect for configuration. 
      */
-    void startServiceMode();
+    void startConfigMode(void);
 
     /**
-     * Scan and print all networks that available.
+     * Scans and returns the available WiFi networks.
      */
-    void scanForNetworks(void);
+    std::vector<WiFiNetwork> scanForNetworks(void);
 
     /**
      * handle TCP. TODO do it with irq!
@@ -43,7 +52,7 @@ public:
      * Setup the current WiFi manager
      */
     void setup(void);
-private:    
+private:
     /**
      * Private copy constructor.
      */
