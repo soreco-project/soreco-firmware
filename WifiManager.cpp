@@ -20,11 +20,11 @@ void WifiManager::startConfigMode(void) {
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(localIp, gateway, subnet);
     
-    // start config hotspot with device serial number as ssid and password on channel 1
     char ssid[32+1];
     memcpy(ssid, CONFIG_SSID_PREFIX, strlen(CONFIG_SSID_PREFIX));
     itoa(DeviceSettings::getDeviceParameters().deviceSerialNumber, &ssid[strlen(CONFIG_SSID_PREFIX)], 10);
-    WiFi.softAP(ssid, CONFIG_PASSWORD, 1, SSID_HIDDEN);
+    // start config hotspot with device serial number as ssid (no password)
+    WiFi.softAP(ssid);
     
     Serial.println("AP started...");
     Serial.print("soreco host address: "); Serial.println(WiFi.softAPIP());

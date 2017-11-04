@@ -19,9 +19,7 @@ public:
     };
 
     static const uint16_t PORT = 4000;
-    static const bool SSID_HIDDEN = false;
     const char* CONFIG_SSID_PREFIX = "soreco-";
-    const char* CONFIG_PASSWORD = "12345678";
 
     /**
      * Default constructor.
