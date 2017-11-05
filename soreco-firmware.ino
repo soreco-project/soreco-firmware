@@ -4,7 +4,6 @@
  *************************************************************************************************/
 
 #include "Arduino.h"
-#include "SonosDiscovery.h"
 #include "DebugConsole.h"
 #include "DeviceSettings.h"
 #include "WifiManager.h"
@@ -26,6 +25,7 @@ void setup() {
     debugConsole.setup(wifiManager);
     wifiManager.setup();
 
+    // TODO: move to DeviceStateMachine
     DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
     if (wifiConfig.isConfigured()) {
         Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
