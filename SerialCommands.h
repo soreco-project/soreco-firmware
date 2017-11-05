@@ -48,7 +48,7 @@ private:
 
     void clearBuffer(void);
     
-    static const uint8_t MAX_COMMAND_LENGTH = 32;
+    static const uint8_t MAX_COMMAND_LENGTH = 48;
     static const uint8_t MAX_COMMANDS = 32;
     const char* COMMAND_DELIMITER = " ";
     const char COMMAND_TERMINATOR = '\n';

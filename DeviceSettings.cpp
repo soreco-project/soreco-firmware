@@ -16,7 +16,7 @@ DeviceSettings::DeviceSettings(void) {
 
 void DeviceSettings::load(void) {
     assert(CURRENT_EEPROM_LAYOUT_SIZE_BYTES <= 4096);
-    Serial.print("DeviceSettings: Loading EEPROM layout with size = "); Serial.println(CURRENT_EEPROM_LAYOUT_SIZE_BYTES);
+    Serial.print(F("DeviceSettings: Loading EEPROM layout with size = ")); Serial.println(CURRENT_EEPROM_LAYOUT_SIZE_BYTES);
     // ESP8622 needs EEPROM.begin(), so it copies the flash block into a memory area
     EEPROM.begin(CURRENT_EEPROM_LAYOUT_SIZE_BYTES);
 }

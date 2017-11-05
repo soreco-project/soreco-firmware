@@ -5,27 +5,15 @@
 #include "SerialCommands.h"
 #include "DeviceSettings.h"
 
+// Note: try to use flash strings to reduce RAM usage!
+// https://espressif.com/sites/default/files/documentation/save_esp8266ex_ram_with_progmem_en.pdf
+
 SerialCommands serialCommands;
+// workaround to have access from non-member functions to components
+WifiManager* pWiFiManager = NULL;
 
 void cmdHelp(void) {
     serialCommands.listCommands();
-}
-
-void cmdConfigSerialNumberGet(void) {
-    DeviceSettings::DeviceParameters params = DeviceSettings::getDeviceParameters();
-    Serial.println(params.deviceSerialNumber);
-}
-
-void cmdConfigSerialNumberSet(void) {
-    DeviceSettings::DeviceParameters params;
-    char* argument = serialCommands.getArgument();
-    if (argument != NULL) {
-        params.deviceSerialNumber = atoi(argument);
-        DeviceSettings::setDeviceParameters(params);
-    }
-    else {
-        Serial.println("Error - expecting argument 'serialNumber' as number!");
-    }
 }
 
 void cmdConfigSave(void) {
@@ -40,19 +28,146 @@ void cmdConfigFactoryDefaults(void) {
     DeviceSettings::factoryDefaults();
 }
 
+void cmdConfigSerialNumber(void) {
+    DeviceSettings::DeviceParameters config = DeviceSettings::getDeviceParameters();
+    char* argument = serialCommands.getArgument();
+    if (argument == NULL) {
+        // get
+        Serial.println(config.deviceSerialNumber);
+    }
+    else {
+        // set
+        config.deviceSerialNumber = atoi(argument);
+        DeviceSettings::setDeviceParameters(config);
+    }
+}
+
+void cmdConfigWiFiSSID(void) {
+    DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
+    char* argument = serialCommands.getArgument();
+    if (argument == NULL) {
+        // get
+        Serial.println(config.ssid);
+    }
+    else {
+        // set
+        strncpy(config.ssid, argument, sizeof(config.ssid));
+        DeviceSettings::setWiFiConfig(config);
+    }
+}
+
+void cmdConfigWiFiPassphrase(void) {
+    DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
+    char* argument = serialCommands.getArgument();
+    if (argument == NULL) {
+        // get
+        Serial.println(config.passphrase);
+    }
+    else {
+        // set
+        strncpy(config.passphrase, argument, sizeof(config.passphrase));
+        DeviceSettings::setWiFiConfig(config);
+    }
+}
+
+void cmdWiFiScan(void) {
+    Serial.print(F("Scanning WiFi networks.."));
+    std::vector<WifiManager::WiFiNetwork> networks = pWiFiManager->scanForNetworks();
+    Serial.print(F("..done! (")); Serial.print(networks.size()); Serial.println(F(" networks found)"));
+    for (int i = 0; i < networks.size(); i++) {
+        // Print SSID and RSSI for each network found
+        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(networks[i].ssid);
+        Serial.print(F(" (")); Serial.print(networks[i].signalStrength); Serial.print(F(")"));
+        Serial.println((networks[i].encryptionType == ENC_TYPE_NONE)? F(" ") : F("*"));
+    }
+    Serial.println("");
+}
+
+void cmdWiFiConnect(void) {
+    DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
+    Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
+    pWiFiManager->startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
+
+    int16_t timeOutMs = 15000;
+    const int16_t delayMs = 1000;
+    while ((WiFi.status() != WL_CONNECTED) && (timeOutMs > 0)) {
+        delay(delayMs);
+        Serial.print(F("."));
+        timeOutMs -= delayMs;
+    }
+
+    if (timeOutMs > 0) {
+        Serial.println(F("success!"));
+        Serial.print(F("IP address: ")); Serial.println(WiFi.localIP());
+    }
+    else {
+        Serial.println(F("failed!"));
+    }
+}
+
+void cmdWiFiStartHotspot(void) {
+    Serial.println(F("Starting WiFi hotspot for configuration"));
+    pWiFiManager->startConfigMode();
+}
+
+void cmdWiFiStatusClient(void) {
+    Serial.print(F("WiFi client mode: "));
+    wl_status_t wifiStatus = WiFi.status();
+    switch (wifiStatus) {
+        case WL_CONNECTED:
+            Serial.print(F("connected to ")); Serial.println(WiFi.SSID());
+            Serial.print(F("IP: ")); Serial.println(WiFi.localIP());
+            Serial.print(F("Signal strength: ")); Serial.println(WiFi.RSSI());
+            break;
+        case WL_DISCONNECTED:
+            Serial.println(F("disconnected"));
+            break;
+        default:
+            Serial.println(wifiStatus);
+            break;
+    }
+}
+
+void cmdWiFiStatusConfiguration(void) {
+    Serial.print(F("WiFi configuration mode: "));
+    Serial.print(WiFi.softAPgetStationNum()); Serial.println(F(" stations connected"));
+}
+
+void cmdWiFiStatus(void) {
+    WiFiMode_t mode = WiFi.getMode();
+    switch(mode) {
+        case WIFI_AP:
+            cmdWiFiStatusConfiguration();
+            break;
+        case WIFI_STA:
+            cmdWiFiStatusClient();
+            break;
+        default:
+            Serial.println(F("Unknown WiFi mode"));
+            break;
+    }
+}
+
 DebugConsole::DebugConsole(void) {
 }
 
 DebugConsole::~DebugConsole(void) {
 }
 
-void DebugConsole::setup(void) {
+void DebugConsole::setup(WifiManager& wifiManager) {
+    pWiFiManager = &wifiManager;
+
     serialCommands.addCommand("help", cmdHelp);
-    serialCommands.addCommand("Config.SerialNumber.Get", cmdConfigSerialNumberGet);
-    serialCommands.addCommand("Config.SerialNumber.Set", cmdConfigSerialNumberSet);
     serialCommands.addCommand("Config.Save", cmdConfigSave);
     serialCommands.addCommand("Config.ClearAll", cmdConfigClearAll);
     serialCommands.addCommand("Config.FactoryDefaults", cmdConfigFactoryDefaults);
+    serialCommands.addCommand("Config.SerialNumber", cmdConfigSerialNumber);    
+    serialCommands.addCommand("Config.WiFi.SSID", cmdConfigWiFiSSID);
+    serialCommands.addCommand("Config.WiFi.Passphrase", cmdConfigWiFiPassphrase);
+    serialCommands.addCommand("WiFi.Scan", cmdWiFiScan);
+    serialCommands.addCommand("WiFi.Connect", cmdWiFiConnect);
+    serialCommands.addCommand("WiFi.StartHotspot", cmdWiFiStartHotspot);
+    serialCommands.addCommand("WiFi.Status", cmdWiFiStatus);
 }
 
 void DebugConsole::loop(void) {
