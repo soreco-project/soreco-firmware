@@ -85,8 +85,8 @@ void cmdWiFiConnect(void) {
     Serial.print("Connecting to configured WiFi "); Serial.println(wifiConfig.ssid);
     pWiFiManager->startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
 
-    int16_t timeOutMs = 10000;
-    const int16_t delayMs = 500;
+    int16_t timeOutMs = 15000;
+    const int16_t delayMs = 1000;
     while ((WiFi.status() != WL_CONNECTED) && (timeOutMs > 0)) {
         delay(delayMs);
         Serial.print(".");
@@ -107,17 +107,40 @@ void cmdWiFiStartHotspot(void) {
     pWiFiManager->startConfigMode();
 }
 
-void cmdWiFiStatus(void) {
+void cmdWiFiStatusClient(void) {
+    Serial.print("WiFi client mode: ");
     wl_status_t wifiStatus = WiFi.status();
     switch (wifiStatus) {
         case WL_CONNECTED:
-            Serial.print("WiFi connected, IP address: "); Serial.println(WiFi.localIP());
+            Serial.print("connected to "); Serial.println(WiFi.SSID());
+            Serial.print("IP: "); Serial.println(WiFi.localIP());
+            Serial.print("Signal strength: "); Serial.println(WiFi.RSSI());
             break;
         case WL_DISCONNECTED:
-            Serial.println("WiFi disconnected");
+            Serial.println("disconnected");
             break;
         default:
             Serial.println(wifiStatus);
+            break;
+    }
+}
+
+void cmdWiFiStatusConfiguration(void) {
+    Serial.print("WiFi configuration mode: ");
+    Serial.print(WiFi.softAPgetStationNum()); Serial.println(" stations connected");
+}
+
+void cmdWiFiStatus(void) {
+    WiFiMode_t mode = WiFi.getMode();
+    switch(mode) {
+        case WIFI_AP:
+            cmdWiFiStatusConfiguration();
+            break;
+        case WIFI_STA:
+            cmdWiFiStatusClient();
+            break;
+        default:
+            Serial.println("Unknown WiFi mode");
             break;
     }
 }
