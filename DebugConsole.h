@@ -37,7 +37,7 @@ private:
     DebugConsole(const DebugConsole&);
    
     /**
-    * Private assignment constructor.
+    * Private assignment operator.
     */
     DebugConsole& operator=(const DebugConsole&);
 };

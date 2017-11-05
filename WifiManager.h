@@ -63,7 +63,7 @@ private:
     WifiManager(const WifiManager&);
 
     /**
-     * Private assignment constructor.
+     * Private assignment operator.
      */
     WifiManager& operator=(const WifiManager&);
 

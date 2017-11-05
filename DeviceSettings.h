@@ -146,7 +146,7 @@ private:
     DeviceSettings(const DeviceSettings&);
 
     /**
-     * Private assignment constructor.
+     * Private assignment operator.
      */
     DeviceSettings& operator=(const DeviceSettings&);
 
