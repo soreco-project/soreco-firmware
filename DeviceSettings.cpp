@@ -40,10 +40,20 @@ void DeviceSettings::clearAll(void) {
 }
 
 void DeviceSettings::factoryDefaults(void) {
+    // preserve serial number
     DeviceParameters parameters = getDeviceParameters();
     clearAll();
     EEPROM.write(0, CURRENT_EEPROM_LAYOUT_VERSION);
     setDeviceParameters(parameters);
+
+    // default device config
+    DeviceConfig deviceConfig;
+    deviceConfig.configFlags.fields.maxVolumeLimitActive = false;
+    deviceConfig.configFlags.fields.stayAlwaysOnActive = false;
+    deviceConfig.maxVolume = 50;
+    deviceConfig.deepSleepTimeout = 30;
+    setDeviceConfig(deviceConfig);
+
     save();
 }
 
