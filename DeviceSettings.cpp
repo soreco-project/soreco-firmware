@@ -16,9 +16,16 @@ DeviceSettings::DeviceSettings(void) {
 
 void DeviceSettings::load(void) {
     assert(CURRENT_EEPROM_LAYOUT_SIZE_BYTES <= 4096);
-    Serial.print(F("DeviceSettings: Loading EEPROM layout with size = ")); Serial.println(CURRENT_EEPROM_LAYOUT_SIZE_BYTES);
+    Serial.print(F("DeviceSettings: Current EEPROM layout size = ")); Serial.println(CURRENT_EEPROM_LAYOUT_SIZE_BYTES);
     // ESP8622 needs EEPROM.begin(), so it copies the flash block into a memory area
     EEPROM.begin(CURRENT_EEPROM_LAYOUT_SIZE_BYTES);
+
+    // in case of a downgrade from a unknown EEPROM layout version, we simply restore the factory factory defaults
+    uint8_t layoutVersion = EEPROM.read(0);
+    if (layoutVersion != CURRENT_EEPROM_LAYOUT_VERSION) {
+        Serial.println(F("Warning - unknown EEPROM layout version! Restoring factory defaults"));
+        factoryDefaults();
+    }
 }
 
 void DeviceSettings::save(void) {
@@ -35,6 +42,7 @@ void DeviceSettings::clearAll(void) {
 void DeviceSettings::factoryDefaults(void) {
     DeviceParameters parameters = getDeviceParameters();
     clearAll();
+    EEPROM.write(0, CURRENT_EEPROM_LAYOUT_VERSION);
     setDeviceParameters(parameters);
     save();
 }
