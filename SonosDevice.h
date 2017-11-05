@@ -29,14 +29,9 @@ public:
     };
 
     /**
-     * Default Constructor.
+     * Constructor with IP address and unique device identifier.
      */
-    SonosDevice(void);
-
-    /**
-     * Constructor with IP address.
-     */
-    SonosDevice(IPAddress ipAddress);
+    SonosDevice(IPAddress ipAddress, String uuid);
 
     /**
      * Connect to the given IP address.
@@ -47,6 +42,11 @@ public:
      * Get the IP address of the sonos device.
      */
     IPAddress getIpAddress(void);
+
+    /**
+     * Get the unique device identifier.
+     */
+    String getUUID(void);
 
     /**
      * Get the play state of the device.
@@ -129,6 +129,7 @@ private:
 
     // instance fields
     IPAddress m_ipAddress;
+    String m_uuid;
 };
 
 #endif //  SONOSDEVICE_H

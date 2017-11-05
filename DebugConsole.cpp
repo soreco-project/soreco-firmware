@@ -160,7 +160,8 @@ void cmdSonosDiscover(void) {
     Serial.print(F("..done! (")); Serial.print(sonosDevices.size()); Serial.println(F(" devices found)"));
 
     for (int i = 0; i < sonosDevices.size(); i++) {
-        Serial.print(i + 1); Serial.print(F(": ")); Serial.println(sonosDevices[i].getIpAddress());
+        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(sonosDevices[i].getIpAddress());
+        Serial.print(F(" (")); Serial.print(sonosDevices[i].getUUID()); Serial.println(F(")"));
     }
 }
 

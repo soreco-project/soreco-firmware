@@ -1,8 +1,12 @@
 #ifndef SONOSDISCOVERY_H
 #define SONOSDISCOVERY_H
 
-#include <vector>
 #include "SonosDevice.h"
+
+#include "Arduino.h"
+#include <vector>
+#include <ESP8266WiFi.h>
+#include <WiFiUDP.h>
 
 /**
  * Helper class to discover all avaiable Sonos devices in the network.
@@ -20,8 +24,11 @@ public:
 
 private:
 
-    // Simple Service Discovery Protocol
+    // SSDP port (Simple Service Discovery Protocol)
     static const uint16_t SSDP_PORT = 1900;
+
+    // private helpers
+    static void processResponse(WiFiUDP& udpClient, std::vector<SonosDevice>& deviceList);
 
     /**
      * Private default constructor.
