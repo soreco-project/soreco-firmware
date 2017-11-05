@@ -24,14 +24,15 @@ public:
      * Device configuration contains the user settings which are persistent across reboots.
      */
     struct DeviceConfig {
-        union ConfigFlags {
-            struct {
-                bool maxVolumeLimitActive : 1;
-                bool stayAlwaysOnActive : 1;
-                // 30 flags remaining for future use
-            };
-            uint32_t flags;
+        struct ConfigFlags {
+            bool maxVolumeLimitActive : 1;
+            bool stayAlwaysOnActive : 1;
+            // 30 flags remaining for future use
         };
+        union {
+            ConfigFlags fields;
+            uint32_t value;
+        } configFlags;
         // name of soreco
         char deviceName[32+1] = "";
         // upper threshold for volume
@@ -52,13 +53,14 @@ public:
      * WiFi configuration contain the connectivity settings which are persistent across reboots.
      */
     struct WiFiConfig {
-        union ConfigFlags {
-            struct {
-                bool dhcpActive : 1;
-                // 32 flags remaining for future use
-            };
-            uint32_t flags;
+        struct ConfigFlags {
+            bool dhcpActive : 1;
+            // 31 flags remaining for future use
         };
+        union {
+            ConfigFlags fields;
+            uint32_t value;
+        } configFlags;
         // max SSID length is 32 characters, reserve 1 additional byte for string null termination
         char ssid[32+1] = "";
         // max passphrase length for WPA-PSK is 63 characters
@@ -83,14 +85,15 @@ public:
     struct PresetConfig {
         struct Action {
             enum ActionType {
+                NONE = 0,
                 PLAY_URI = 1,
-                VOLUME = 2,
-                GROUP_ALL_PLAYERS = 3,
+                SET_VOLUME = 2,
+                GROUP_ALL = 3,
                 TURN_OFF_TIMER = 4
             };
             uint8_t actionIdentifier;
             // TODO: better way to be flexible for the future?
-            uint8_t actionParameters[32];    
+            uint8_t actionParameters[64];
         };
         
         char mediaUri[255+1] = "";
