@@ -9,8 +9,12 @@
 #include <vector>
 
 class SonosDevice {
+
 public:
 
+    /**
+     * List of possible play states.
+     */
     enum PlayState {
         // Player has an error
         ERROR,
@@ -25,7 +29,12 @@ public:
     };
 
     /**
-     * Constructor.
+     * Default Constructor.
+     */
+    SonosDevice(void);
+
+    /**
+     * Constructor with IP address.
      */
     SonosDevice(IPAddress ipAddress);
 
@@ -33,6 +42,11 @@ public:
      * Destructor.
      */
     ~SonosDevice(void);
+
+    /**
+     * Connect to the given IP address.
+     */
+    bool setIpAddress(IPAddress ipAddress);
 
     /**
      * Get the play state of the device.
@@ -112,10 +126,6 @@ public:
     bool isCoordinator(void);
 
 private:
-    /**
-     * Private default constructor.
-     */
-    SonosDevice(void);
 
     /**
      * Private copy constructor.
