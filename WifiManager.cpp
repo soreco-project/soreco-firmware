@@ -23,7 +23,6 @@ void WifiManager::loop(void) {
   // check for a client to connect
   if (client) {
         if (client.connected()) {
-            Serial.println("Connected");
             // TODO parse data
             // client.readBytesUntil(char terminator, char *buffer, size_t length)
         }
@@ -47,12 +46,14 @@ void WifiManager::startConfigMode(void) {
     // start config hotspot with device serial number as ssid (no password)
     WiFi.softAPConfig(localIp, gateway, subnet);
     bool success = WiFi.softAP(ssid);
+
+    // TODO: try to not write to serial console within the components
     if (success) {
-        Serial.print("Hotspot "); Serial.print(ssid); Serial.println(" started");
-        Serial.print("soreco host address: "); Serial.println(WiFi.softAPIP());
+        Serial.print(F("Hotspot ")); Serial.print(ssid); Serial.println(F(" started"));
+        Serial.print(F("soreco host address: ")); Serial.println(WiFi.softAPIP());
     }
     else {
-        Serial.println("Failed to start hotspot!");
+        Serial.println(F("Failed to start hotspot!"));
     }
 }
 

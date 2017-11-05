@@ -68,7 +68,7 @@ void SerialCommands::addCommand(const char *cmd, void (*function)(void)) {
         m_numberOfCommands++;
     }
     else {
-        Serial.println("ERROR: SerialCommands - reached commands limit"); 
+        Serial.println(F("ERROR: SerialCommands - reached commands limit")); 
     }
 }
 

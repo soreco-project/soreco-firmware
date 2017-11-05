@@ -5,6 +5,9 @@
 #include "SerialCommands.h"
 #include "DeviceSettings.h"
 
+// Note: try to use flash strings to reduce RAM usage!
+// https://espressif.com/sites/default/files/documentation/save_esp8266ex_ram_with_progmem_en.pdf
+
 SerialCommands serialCommands;
 // workaround to have access from non-member functions to components
 WifiManager* pWiFiManager = NULL;
@@ -68,56 +71,56 @@ void cmdConfigWiFiPassphrase(void) {
 }
 
 void cmdWiFiScan(void) {
-    Serial.print("Scanning WiFi networks..");
+    Serial.print(F("Scanning WiFi networks.."));
     std::vector<WifiManager::WiFiNetwork> networks = pWiFiManager->scanForNetworks();
-    Serial.print("..done! ("); Serial.print(networks.size()); Serial.println(" networks found)");
+    Serial.print(F("..done! (")); Serial.print(networks.size()); Serial.println(F(" networks found)"));
     for (int i = 0; i < networks.size(); i++) {
         // Print SSID and RSSI for each network found
-        Serial.print(i + 1); Serial.print(": "); Serial.print(networks[i].ssid);
-        Serial.print(" ("); Serial.print(networks[i].signalStrength); Serial.print(")");
-        Serial.println((networks[i].encryptionType == ENC_TYPE_NONE)?" ":"*");
+        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(networks[i].ssid);
+        Serial.print(F(" (")); Serial.print(networks[i].signalStrength); Serial.print(F(")"));
+        Serial.println((networks[i].encryptionType == ENC_TYPE_NONE)? F(" ") : F("*"));
     }
     Serial.println("");
 }
 
 void cmdWiFiConnect(void) {
     DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
-    Serial.print("Connecting to configured WiFi "); Serial.println(wifiConfig.ssid);
+    Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
     pWiFiManager->startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
 
     int16_t timeOutMs = 15000;
     const int16_t delayMs = 1000;
     while ((WiFi.status() != WL_CONNECTED) && (timeOutMs > 0)) {
         delay(delayMs);
-        Serial.print(".");
+        Serial.print(F("."));
         timeOutMs -= delayMs;
     }
 
     if (timeOutMs > 0) {
-        Serial.println("success!");
-        Serial.print("IP address: "); Serial.println(WiFi.localIP());
+        Serial.println(F("success!"));
+        Serial.print(F("IP address: ")); Serial.println(WiFi.localIP());
     }
     else {
-        Serial.println("failed!");
+        Serial.println(F("failed!"));
     }
 }
 
 void cmdWiFiStartHotspot(void) {
-    Serial.println("Starting WiFi hotspot for configuration");
+    Serial.println(F("Starting WiFi hotspot for configuration"));
     pWiFiManager->startConfigMode();
 }
 
 void cmdWiFiStatusClient(void) {
-    Serial.print("WiFi client mode: ");
+    Serial.print(F("WiFi client mode: "));
     wl_status_t wifiStatus = WiFi.status();
     switch (wifiStatus) {
         case WL_CONNECTED:
-            Serial.print("connected to "); Serial.println(WiFi.SSID());
-            Serial.print("IP: "); Serial.println(WiFi.localIP());
-            Serial.print("Signal strength: "); Serial.println(WiFi.RSSI());
+            Serial.print(F("connected to ")); Serial.println(WiFi.SSID());
+            Serial.print(F("IP: ")); Serial.println(WiFi.localIP());
+            Serial.print(F("Signal strength: ")); Serial.println(WiFi.RSSI());
             break;
         case WL_DISCONNECTED:
-            Serial.println("disconnected");
+            Serial.println(F("disconnected"));
             break;
         default:
             Serial.println(wifiStatus);
@@ -126,8 +129,8 @@ void cmdWiFiStatusClient(void) {
 }
 
 void cmdWiFiStatusConfiguration(void) {
-    Serial.print("WiFi configuration mode: ");
-    Serial.print(WiFi.softAPgetStationNum()); Serial.println(" stations connected");
+    Serial.print(F("WiFi configuration mode: "));
+    Serial.print(WiFi.softAPgetStationNum()); Serial.println(F(" stations connected"));
 }
 
 void cmdWiFiStatus(void) {
@@ -140,7 +143,7 @@ void cmdWiFiStatus(void) {
             cmdWiFiStatusClient();
             break;
         default:
-            Serial.println("Unknown WiFi mode");
+            Serial.println(F("Unknown WiFi mode"));
             break;
     }
 }

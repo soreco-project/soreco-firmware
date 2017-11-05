@@ -14,10 +14,12 @@ DebugConsole debugConsole;
 WifiManager wifiManager;
 
 void setup() {
+    // // Note: try to use flash strings to reduce RAM usage!
+    // https://espressif.com/sites/default/files/documentation/save_esp8266ex_ram_with_progmem_en.pdf   
     Serial.begin(115200); Serial.println();
-    Serial.print("Firmware soreco V"); Serial.println(FIRMWARE_VERSION);
-    Serial.print("Compiletime: "); Serial.print(__TIME__); Serial.print(" "); Serial.println(__DATE__);
-    Serial.print("ESP8266 SDK: "); Serial.println(ESP.getSdkVersion());
+    Serial.print(F("Firmware soreco V")); Serial.println(FIRMWARE_VERSION);
+    Serial.print(F("Compiletime: ")); Serial.print(__TIME__); Serial.print(" "); Serial.println(__DATE__);
+    Serial.print(F("ESP8266 SDK: ")); Serial.println(ESP.getSdkVersion());
 
     DeviceSettings::load();
     debugConsole.setup(wifiManager);
@@ -25,12 +27,12 @@ void setup() {
 
     DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
     if (wifiConfig.isConfigured()) {
-        Serial.print("Connecting to configured WiFi "); Serial.println(wifiConfig.ssid);
+        Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
         wifiManager.startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
     }
     else {
         // only enter config mode when there is no stored network in DeviceSettings
-        Serial.println("Starting WiFi hotspot for configuration");
+        Serial.println(F("Starting WiFi hotspot for configuration"));
         wifiManager.startConfigMode();
     }
 }
