@@ -4,6 +4,7 @@
 
 #include "SerialCommands.h"
 #include "DeviceSettings.h"
+#include "SonosDiscovery.h"
 
 // Note: try to use flash strings to reduce RAM usage!
 // https://espressif.com/sites/default/files/documentation/save_esp8266ex_ram_with_progmem_en.pdf
@@ -80,7 +81,6 @@ void cmdWiFiScan(void) {
         Serial.print(F(" (")); Serial.print(networks[i].signalStrength); Serial.print(F(")"));
         Serial.println((networks[i].encryptionType == ENC_TYPE_NONE)? F(" ") : F("*"));
     }
-    Serial.println("");
 }
 
 void cmdWiFiConnect(void) {
@@ -148,6 +148,22 @@ void cmdWiFiStatus(void) {
     }
 }
 
+void cmdSonosDiscover(void) {
+    uint16_t timeoutMs = 5000;
+    char* argument = serialCommands.getArgument();
+    if (argument != NULL) {
+        timeoutMs = atoi(argument);
+    }
+
+    Serial.print(F("Discovering Sonos devices.."));
+    std::vector<SonosDevice> sonosDevices = SonosDiscovery::discover(timeoutMs);
+    Serial.print(F("..done! (")); Serial.print(sonosDevices.size()); Serial.println(F(" devices found)"));
+
+    for (int i = 0; i < sonosDevices.size(); i++) {
+        Serial.print(i + 1); Serial.print(F(": ")); Serial.println(sonosDevices[i].getIpAddress());
+    }
+}
+
 DebugConsole::DebugConsole(void) {
 }
 
@@ -168,6 +184,7 @@ void DebugConsole::setup(WifiManager& wifiManager) {
     serialCommands.addCommand("WiFi.Connect", cmdWiFiConnect);
     serialCommands.addCommand("WiFi.StartHotspot", cmdWiFiStartHotspot);
     serialCommands.addCommand("WiFi.Status", cmdWiFiStatus);
+    serialCommands.addCommand("Sonos.Discover", cmdSonosDiscover);
 }
 
 void DebugConsole::loop(void) {

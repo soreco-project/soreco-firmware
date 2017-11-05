@@ -1,13 +1,13 @@
-/*************************************************** 
- Representation of a Sonos device.
- ****************************************************/
-
 #ifndef SONOSDEVICE_H
 #define SONOSDEVICE_H
 
 #include "IPAddress.h"
 #include <vector>
 
+/**
+ * Representation of a Sonos device.
+ * Note: default destructor, copy constructors and assignment operators are fine since we don't store pointers.
+ */
 class SonosDevice {
 
 public:
@@ -39,14 +39,14 @@ public:
     SonosDevice(IPAddress ipAddress);
 
     /**
-     * Destructor.
-     */
-    ~SonosDevice(void);
-
-    /**
      * Connect to the given IP address.
      */
     bool setIpAddress(IPAddress ipAddress);
+
+    /**
+     * Get the IP address of the sonos device.
+     */
+    IPAddress getIpAddress(void);
 
     /**
      * Get the play state of the device.
@@ -127,16 +127,6 @@ public:
 
 private:
 
-    /**
-     * Private copy constructor.
-     */
-    SonosDevice(const SonosDevice&);
-
-    /**
-     * Private assignment constructor.
-     */
-    SonosDevice& operator=(const SonosDevice&);
-    
     // instance fields
     IPAddress m_ipAddress;
 };
