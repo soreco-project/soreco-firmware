@@ -42,6 +42,21 @@ void cmdConfigSerialNumber(void) {
     }
 }
 
+void cmdDeviceName(void) {
+    DeviceSettings::DeviceConfig config = DeviceSettings::getDeviceConfig();
+    char* argument = serialCommands.getArgument();
+    if (argument == NULL) {
+        // get
+        Serial.println(config.deviceName);
+    }
+    else {
+        // set
+        strncpy(config.deviceName, argument, sizeof(config.deviceName));
+        DeviceSettings::setDeviceConfig(config);
+    }
+}
+
+
 void cmdConfigWiFiSSID(void) {
     DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
     char* argument = serialCommands.getArgument();
@@ -162,6 +177,7 @@ void DebugConsole::setup(WifiManager& wifiManager) {
     serialCommands.addCommand("Config.ClearAll", cmdConfigClearAll);
     serialCommands.addCommand("Config.FactoryDefaults", cmdConfigFactoryDefaults);
     serialCommands.addCommand("Config.SerialNumber", cmdConfigSerialNumber);    
+    serialCommands.addCommand("Config.DeviceName", cmdDeviceName);
     serialCommands.addCommand("Config.WiFi.SSID", cmdConfigWiFiSSID);
     serialCommands.addCommand("Config.WiFi.Passphrase", cmdConfigWiFiPassphrase);
     serialCommands.addCommand("WiFi.Scan", cmdWiFiScan);
