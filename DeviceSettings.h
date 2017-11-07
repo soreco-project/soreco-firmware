@@ -45,8 +45,8 @@ public:
      * Sonos configuration specifically for Sonos which are persistent across reboots.
      */
     struct SonosConfig {
-        // sonos device to control
-        char sonosDeviceName[32+1] = "";
+        // sonos zone to control
+        char sonosZone[32+1] = "";
     };
     
     /**

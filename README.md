@@ -14,6 +14,7 @@ The debug console is currently the only way to interact with the device. There a
 * Config.FactoryDefaults (reset all configuration (except DeviceParameters) to factory defaults)
 * Config.SerialNumber (get / set the serial number)
 * Config.DeviceName (get / set the device name)
+* Config.Sonos.Zone (get / set the sonos zone)
 * Config.WiFi.SSID (get / set the WiFi SSID to connect to)
 * Config.WiFi.Passphrase (get / set the WiFi passphrase for SSID)
 * WiFi.Scan (scan and report all available WiFi networks)

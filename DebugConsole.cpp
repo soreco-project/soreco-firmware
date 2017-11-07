@@ -56,6 +56,19 @@ void cmdDeviceName(void) {
     }
 }
 
+void cmdSonosZone(void) {
+    DeviceSettings::SonosConfig config = DeviceSettings::getSonosConfig();
+    char* argument = serialCommands.getArgument();
+    if (argument == NULL) {
+        // get
+        Serial.println(config.sonosZone);
+    }
+    else {
+        // set
+        strncpy(config.sonosZone, argument, sizeof(config.sonosZone));
+        DeviceSettings::setSonosConfig(config);
+    }
+}
 
 void cmdConfigWiFiSSID(void) {
     DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
@@ -178,6 +191,7 @@ void DebugConsole::setup(WifiManager& wifiManager) {
     serialCommands.addCommand("Config.FactoryDefaults", cmdConfigFactoryDefaults);
     serialCommands.addCommand("Config.SerialNumber", cmdConfigSerialNumber);    
     serialCommands.addCommand("Config.DeviceName", cmdDeviceName);
+    serialCommands.addCommand("Config.Sonos.Zone", cmdSonosZone);
     serialCommands.addCommand("Config.WiFi.SSID", cmdConfigWiFiSSID);
     serialCommands.addCommand("Config.WiFi.Passphrase", cmdConfigWiFiPassphrase);
     serialCommands.addCommand("WiFi.Scan", cmdWiFiScan);
