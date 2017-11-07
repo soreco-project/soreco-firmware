@@ -46,7 +46,7 @@ void SonosDiscovery::processResponse(WiFiUDP& udpClient, std::vector<SonosDevice
                 // check if device not already in the list
                 bool deviceAdded = false;
                 for(int i = 0; i < deviceList.size(); i++) {
-                    if (deviceList[i].getUUID() == uuid) {
+                    if (deviceList[i].getUUID().compare(uuid) == 0) {
                         deviceAdded = true;
                         break;
                     }
