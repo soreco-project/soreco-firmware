@@ -18,6 +18,7 @@ SonosDevice::SonosDevice(IPAddress ipAddress, std::string uuid) :
 
 void SonosDevice::setIpAddress(IPAddress ipAddress) {
     m_ipAddress = ipAddress;
+    // TODO: get UUID from device
 }
 
 IPAddress SonosDevice::getIpAddress(void) {

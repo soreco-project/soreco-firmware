@@ -598,7 +598,7 @@ bool SonosUPnP::upnpPost(IPAddress ip, uint8_t upnpMessageType, PGM_P action_P, 
 {
   if (!ethClient.connect(ip, UPNP_PORT)) 
  {
-  Serial.println("we did�nt got a connection");
+  Serial.println("we didn't got a connection");
   return false;
   }
   
@@ -724,7 +724,7 @@ PGM_P SonosUPnP::getUpnpEndpoint(uint8_t upnpMessageType)
 
 void SonosUPnP::ethClient_write(const char *data)
 {
-  Serial.println(data);
+  //Serial.println(data);
   ethClient.print(data);
 }
 
@@ -741,7 +741,7 @@ void SonosUPnP::ethClient_write_P(PGM_P data_P, char *buffer, size_t bufferSize)
    //memcpy_P(buffer, data_P + dataPos, bufferSize); 
    strncpy_P(buffer, data_P + dataPos, bufferSize);
     //strlcpy_P(buffer, data_P + dataPos, bufferSize);
-    Serial.println(buffer);
+    //Serial.println(buffer);
     ethClient.print(buffer);
     dataPos += bufferSize - 1;
   }

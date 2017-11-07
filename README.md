@@ -20,6 +20,8 @@ The debug console is currently the only way to interact with the device. There a
 * WiFi.StartHotspot (start a WiFi hotspot "soreco-xyz", where xyz is the device serial number)
 * WiFi.Status (print the WiFi status)
 * Sonos.Discover (scan and report all available Sonos devices)
+* Sonos.Connect (set Sonos device to control from debug console)
+* Sonos.PlayState (get / set the play state ('play' | 'pause') of the Sonos device)
 
 ## Task List
 [Link to the Trello](https://trello.com/b/eYdj9IFY/firmware)

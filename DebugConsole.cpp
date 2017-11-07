@@ -183,15 +183,35 @@ void cmdSonosPlayState(void) {
     if (argument == NULL) {
         // get
         SonosDevice::PlayState playState = pSonosDevice->getPlayState();
-        Serial.print(F("Play state = ")); Serial.println(playState);
+        Serial.print(F("Play state = ")); 
+        switch(playState) {
+            case SonosDevice::PlayState::ERROR:
+                Serial.println(F("error"));
+                break;
+            case SonosDevice::PlayState::STOPPED:
+                Serial.println(F("stopped"));
+                break;
+            case SonosDevice::PlayState::PLAYING:
+                Serial.println(F("playing"));
+                break;
+            case SonosDevice::PlayState::PAUSED_PLAYBACK:
+                Serial.println(F("paused"));
+                break;
+            default:
+                Serial.println(playState);
+                break;
+        }
     }
     else {
         // set
-        if (stricmp(argument, "play")) {
+        if (stricmp(argument, "play") == 0) {
             pSonosDevice->play();
         }
-        if (stricmp(argument, "pause")) {
+        else if (stricmp(argument, "pause") == 0) {
             pSonosDevice->pause();
+        }
+        else {
+            Serial.println(F("unknown play state argument ('play' | 'pause')"));
         }
     }
 }
