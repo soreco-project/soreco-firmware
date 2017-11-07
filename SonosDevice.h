@@ -1,7 +1,7 @@
 #ifndef SONOSDEVICE_H
 #define SONOSDEVICE_H
 
-#include "IPAddress.h"
+#include <IPAddress.h>
 #include "SonosUPnP.h"
 
 /**

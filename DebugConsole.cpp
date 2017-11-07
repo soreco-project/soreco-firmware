@@ -1,7 +1,6 @@
 #include "DebugConsole.h"
 
 #include <Arduino.h>
-
 #include "SerialCommands.h"
 #include "DeviceSettings.h"
 #include "SonosDiscovery.h"

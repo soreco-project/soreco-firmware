@@ -3,7 +3,7 @@
  This is the entry point for Arduino applications (also known as sketch).
  *************************************************************************************************/
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include "DebugConsole.h"
 #include "DeviceSettings.h"
 #include "WifiManager.h"

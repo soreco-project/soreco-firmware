@@ -23,7 +23,7 @@
 // When pico mode is enabled, XML validation and error handling is disabled
 #define XML_PICO_MODE
 
-#include "Arduino.h"
+#include <Arduino.h>
 #if (defined(__AVR__))
     #include <avr/pgmspace.h>
 #else

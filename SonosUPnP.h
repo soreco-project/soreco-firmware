@@ -22,7 +22,7 @@
 
 //#define SONOS_WRITE_ONLY_MODE
 
-#include "Arduino.h"
+#include <Arduino.h>
 #if (defined(__AVR__))
     #include <avr/pgmspace.h>
 #else

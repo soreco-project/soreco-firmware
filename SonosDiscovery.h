@@ -1,12 +1,11 @@
 #ifndef SONOSDISCOVERY_H
 #define SONOSDISCOVERY_H
 
-#include "SonosDevice.h"
-
-#include "Arduino.h"
+#include <Arduino.h>
+#include <WiFiUDP.h>
 #include <vector>
 #include <ESP8266WiFi.h>
-#include <WiFiUDP.h>
+#include "SonosDevice.h"
 
 /**
  * Helper class to discover all avaiable Sonos devices in the network.
