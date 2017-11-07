@@ -19,7 +19,7 @@ public:
     */
     ~DeviceStateMachine(void);
 
-    // Touch input event handlers
+    // input event handlers
     void onEventVolumeUp(uint16_t volumeStepCount);
     void onEventVolumeDown(uint16_t volumeStepCount);
     void onEventPlayPause(void);

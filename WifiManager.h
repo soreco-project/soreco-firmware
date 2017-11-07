@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <vector>
-#include "ESP8266WiFi.h"
+#include <ESP8266WiFi.h>
 
 /**
  * Wifi manager to handle all interaction with the wifi module.
@@ -12,7 +12,7 @@ class WifiManager {
 public:
 
     struct WiFiNetwork {
-        String ssid;
+        std::string ssid;
         // signal strength in dBm
         int32_t signalStrength;
         wl_enc_type encryptionType;
@@ -63,7 +63,7 @@ private:
     WifiManager(const WifiManager&);
 
     /**
-     * Private assignment constructor.
+     * Private assignment operator.
      */
     WifiManager& operator=(const WifiManager&);
 

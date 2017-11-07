@@ -42,7 +42,7 @@ private:
     SerialCommands(const SerialCommands&);
 
     /**
-    * Private assignment constructor.
+    * Private assignment operator.
     */
     SerialCommands& operator=(const SerialCommands&);
 

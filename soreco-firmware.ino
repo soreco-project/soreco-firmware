@@ -3,15 +3,17 @@
  This is the entry point for Arduino applications (also known as sketch).
  *************************************************************************************************/
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include "DebugConsole.h"
 #include "DeviceSettings.h"
 #include "WifiManager.h"
+#include "SonosDevice.h"
 
 const char* FIRMWARE_VERSION = "0.0.1";
 
 DebugConsole debugConsole;
 WifiManager wifiManager;
+SonosDevice sonosDevice;
 
 void setup() {
     // // Note: try to use flash strings to reduce RAM usage!
@@ -22,9 +24,10 @@ void setup() {
     Serial.print(F("ESP8266 SDK: ")); Serial.println(ESP.getSdkVersion());
 
     DeviceSettings::load();
-    debugConsole.setup(wifiManager);
+    debugConsole.setup(wifiManager, sonosDevice);
     wifiManager.setup();
 
+    // TODO: move to DeviceStateMachine
     DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
     if (wifiConfig.isConfigured()) {
         Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);

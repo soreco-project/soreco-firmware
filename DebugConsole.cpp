@@ -1,9 +1,9 @@
 #include "DebugConsole.h"
 
 #include <Arduino.h>
-
 #include "SerialCommands.h"
 #include "DeviceSettings.h"
+#include "SonosDiscovery.h"
 
 // Note: try to use flash strings to reduce RAM usage!
 // https://espressif.com/sites/default/files/documentation/save_esp8266ex_ram_with_progmem_en.pdf
@@ -11,6 +11,7 @@
 SerialCommands serialCommands;
 // workaround to have access from non-member functions to components
 WifiManager* pWiFiManager = NULL;
+SonosDevice* pSonosDevice = NULL;
 
 void cmdHelp(void) {
     serialCommands.listCommands();
@@ -104,11 +105,10 @@ void cmdWiFiScan(void) {
     Serial.print(F("..done! (")); Serial.print(networks.size()); Serial.println(F(" networks found)"));
     for (int i = 0; i < networks.size(); i++) {
         // Print SSID and RSSI for each network found
-        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(networks[i].ssid);
+        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(networks[i].ssid.c_str());
         Serial.print(F(" (")); Serial.print(networks[i].signalStrength); Serial.print(F(")"));
         Serial.println((networks[i].encryptionType == ENC_TYPE_NONE)? F(" ") : F("*"));
     }
-    Serial.println("");
 }
 
 void cmdWiFiConnect(void) {
@@ -176,14 +176,82 @@ void cmdWiFiStatus(void) {
     }
 }
 
+void cmdSonosDiscover(void) {
+    uint16_t timeoutMs = 5000;
+    char* argument = serialCommands.getArgument();
+    if (argument != NULL) {
+        timeoutMs = atoi(argument);
+    }
+
+    Serial.print(F("Discovering Sonos devices.."));
+    std::vector<SonosDevice> sonosDevices = SonosDiscovery::discover(timeoutMs);
+    Serial.print(F("..done! (")); Serial.print(sonosDevices.size()); Serial.println(F(" devices found)"));
+
+    for (int i = 0; i < sonosDevices.size(); i++) {
+        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(sonosDevices[i].getIpAddress());
+        Serial.print(F(" (")); Serial.print(sonosDevices[i].getUUID().c_str()); Serial.println(F(")"));
+    }
+}
+
+void cmdSonosConnect(void) {
+    char* argument = serialCommands.getArgument();
+    if (argument != NULL) {
+        IPAddress addr;
+        if (addr.fromString(argument)) {
+            pSonosDevice->setIpAddress(addr);
+            return;
+        }
+    }
+    Serial.println(F("expecting IP address as argument"));
+}
+
+void cmdSonosPlayState(void) {
+    char* argument = serialCommands.getArgument();
+    if (argument == NULL) {
+        // get
+        SonosDevice::PlayState playState = pSonosDevice->getPlayState();
+        Serial.print(F("Play state = ")); 
+        switch(playState) {
+            case SonosDevice::PlayState::ERROR:
+                Serial.println(F("error"));
+                break;
+            case SonosDevice::PlayState::STOPPED:
+                Serial.println(F("stopped"));
+                break;
+            case SonosDevice::PlayState::PLAYING:
+                Serial.println(F("playing"));
+                break;
+            case SonosDevice::PlayState::PAUSED_PLAYBACK:
+                Serial.println(F("paused"));
+                break;
+            default:
+                Serial.println(playState);
+                break;
+        }
+    }
+    else {
+        // set
+        if (stricmp(argument, "play") == 0) {
+            pSonosDevice->play();
+        }
+        else if (stricmp(argument, "pause") == 0) {
+            pSonosDevice->pause();
+        }
+        else {
+            Serial.println(F("unknown play state argument ('play' | 'pause')"));
+        }
+    }
+}
+
 DebugConsole::DebugConsole(void) {
 }
 
 DebugConsole::~DebugConsole(void) {
 }
 
-void DebugConsole::setup(WifiManager& wifiManager) {
+void DebugConsole::setup(WifiManager& wifiManager, SonosDevice& sonosDevice) {
     pWiFiManager = &wifiManager;
+    pSonosDevice = &sonosDevice;
 
     serialCommands.addCommand("help", cmdHelp);
     serialCommands.addCommand("Config.Save", cmdConfigSave);
@@ -198,6 +266,9 @@ void DebugConsole::setup(WifiManager& wifiManager) {
     serialCommands.addCommand("WiFi.Connect", cmdWiFiConnect);
     serialCommands.addCommand("WiFi.StartHotspot", cmdWiFiStartHotspot);
     serialCommands.addCommand("WiFi.Status", cmdWiFiStatus);
+    serialCommands.addCommand("Sonos.Discover", cmdSonosDiscover);
+    serialCommands.addCommand("Sonos.Connect", cmdSonosConnect);
+    serialCommands.addCommand("Sonos.PlayState", cmdSonosPlayState);
 }
 
 void DebugConsole::loop(void) {
