@@ -39,7 +39,7 @@ void SonosDiscovery::processResponse(WiFiUDP& udpClient, std::vector<SonosDevice
             if ((uuidStartPos != std::string::npos) && (uuidEndPos != std::string::npos)) {
                 // it's actually a Sonos device and it's safe to read the uuid
                 uuidStartPos += 5; // advance start pointer by length of "uuid:"
-                String uuid = response.substr(uuidStartPos, uuidEndPos - uuidStartPos).c_str();
+                std::string uuid = response.substr(uuidStartPos, uuidEndPos - uuidStartPos);
                 SonosDevice sonosDevice(udpClient.remoteIP(), uuid);
                 
                 // TODO: for a unknown reason we get sporadically multiple responses from the same device

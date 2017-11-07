@@ -2,6 +2,7 @@
 #define DEBUGCONSOLE_H
 
 #include "WifiManager.h"
+#include "SonosDevice.h"
 
 /**
  * Command line interface for development to interact with the device.
@@ -22,7 +23,7 @@ public:
     /**
     * Register console commands.
     */
-    void setup(WifiManager& wifiManager);
+    void setup(WifiManager& wifiManager, SonosDevice& sonosDevice);
 
     /**
     * Process console input.

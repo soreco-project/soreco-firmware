@@ -12,7 +12,7 @@ class WifiManager {
 public:
 
     struct WiFiNetwork {
-        String ssid;
+        std::string ssid;
         // signal strength in dBm
         int32_t signalStrength;
         wl_enc_type encryptionType;

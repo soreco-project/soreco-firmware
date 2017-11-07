@@ -74,8 +74,13 @@ std::vector<WifiManager::WiFiNetwork> WifiManager::scanForNetworks(void) {
     std::vector<WiFiNetwork> networkList;
     int networksFound = WiFi.scanNetworks();
     for (int i = 0; i < networksFound; i++) {
+        // convert Arduino String to std::string
+        String ssid = WiFi.SSID(i);
+        char ssidCharBuffer[ssid.length()+1];
+        ssid.toCharArray(ssidCharBuffer, sizeof(ssidCharBuffer));
+
         WiFiNetwork network;
-        network.ssid = WiFi.SSID(i);
+        network.ssid = ssidCharBuffer;
         network.signalStrength = WiFi.RSSI(i);
         network.encryptionType = (wl_enc_type)WiFi.encryptionType(i);
         networkList.push_back(network);

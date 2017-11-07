@@ -12,6 +12,7 @@
 SerialCommands serialCommands;
 // workaround to have access from non-member functions to components
 WifiManager* pWiFiManager = NULL;
+SonosDevice* pSonosDevice = NULL;
 
 void cmdHelp(void) {
     serialCommands.listCommands();
@@ -77,7 +78,7 @@ void cmdWiFiScan(void) {
     Serial.print(F("..done! (")); Serial.print(networks.size()); Serial.println(F(" networks found)"));
     for (int i = 0; i < networks.size(); i++) {
         // Print SSID and RSSI for each network found
-        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(networks[i].ssid);
+        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(networks[i].ssid.c_str());
         Serial.print(F(" (")); Serial.print(networks[i].signalStrength); Serial.print(F(")"));
         Serial.println((networks[i].encryptionType == ENC_TYPE_NONE)? F(" ") : F("*"));
     }
@@ -161,7 +162,37 @@ void cmdSonosDiscover(void) {
 
     for (int i = 0; i < sonosDevices.size(); i++) {
         Serial.print(i + 1); Serial.print(F(": ")); Serial.print(sonosDevices[i].getIpAddress());
-        Serial.print(F(" (")); Serial.print(sonosDevices[i].getUUID()); Serial.println(F(")"));
+        Serial.print(F(" (")); Serial.print(sonosDevices[i].getUUID().c_str()); Serial.println(F(")"));
+    }
+}
+
+void cmdSonosConnect(void) {
+    char* argument = serialCommands.getArgument();
+    if (argument != NULL) {
+        IPAddress addr;
+        if (addr.fromString(argument)) {
+            pSonosDevice->setIpAddress(addr);
+            return;
+        }
+    }
+    Serial.println(F("expecting IP address as argument"));
+}
+
+void cmdSonosPlayState(void) {
+    char* argument = serialCommands.getArgument();
+    if (argument == NULL) {
+        // get
+        SonosDevice::PlayState playState = pSonosDevice->getPlayState();
+        Serial.print(F("Play state = ")); Serial.println(playState);
+    }
+    else {
+        // set
+        if (stricmp(argument, "play")) {
+            pSonosDevice->play();
+        }
+        if (stricmp(argument, "pause")) {
+            pSonosDevice->pause();
+        }
     }
 }
 
@@ -171,8 +202,9 @@ DebugConsole::DebugConsole(void) {
 DebugConsole::~DebugConsole(void) {
 }
 
-void DebugConsole::setup(WifiManager& wifiManager) {
+void DebugConsole::setup(WifiManager& wifiManager, SonosDevice& sonosDevice) {
     pWiFiManager = &wifiManager;
+    pSonosDevice = &sonosDevice;
 
     serialCommands.addCommand("help", cmdHelp);
     serialCommands.addCommand("Config.Save", cmdConfigSave);
@@ -186,6 +218,8 @@ void DebugConsole::setup(WifiManager& wifiManager) {
     serialCommands.addCommand("WiFi.StartHotspot", cmdWiFiStartHotspot);
     serialCommands.addCommand("WiFi.Status", cmdWiFiStatus);
     serialCommands.addCommand("Sonos.Discover", cmdSonosDiscover);
+    serialCommands.addCommand("Sonos.Connect", cmdSonosConnect);
+    serialCommands.addCommand("Sonos.PlayState", cmdSonosPlayState);
 }
 
 void DebugConsole::loop(void) {

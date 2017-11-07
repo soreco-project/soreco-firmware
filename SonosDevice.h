@@ -2,7 +2,7 @@
 #define SONOSDEVICE_H
 
 #include "IPAddress.h"
-#include <vector>
+#include "SonosUPnP.h"
 
 /**
  * Representation of a Sonos device.
@@ -17,26 +17,31 @@ public:
      */
     enum PlayState {
         // Player has an error
-        ERROR,
+        ERROR = 0,
         // Player is stopped
-        STOPPED,
+        STOPPED = 1,
         // Player is playing
-        PLAYING,
+        PLAYING = 2,
         // Player is paused
-        PAUSED_PLAYBACK,
+        PAUSED_PLAYBACK = 3,
         // Player is loading
-        TRANSITIONING
+        TRANSITIONING = 4
     };
+
+    /**
+     * Default constructor.
+     */
+    SonosDevice(void);
 
     /**
      * Constructor with IP address and unique device identifier.
      */
-    SonosDevice(IPAddress ipAddress, String uuid);
+    SonosDevice(IPAddress ipAddress, std::string uuid);
 
     /**
-     * Connect to the given IP address.
+     * Update destination to the given IP address.
      */
-    bool setIpAddress(IPAddress ipAddress);
+    void setIpAddress(IPAddress ipAddress);
 
     /**
      * Get the IP address of the sonos device.
@@ -46,7 +51,7 @@ public:
     /**
      * Get the unique device identifier.
      */
-    String getUUID(void);
+    std::string getUUID(void);
 
     /**
      * Get the play state of the device.
@@ -59,7 +64,7 @@ public:
      * @param uri URI of a stream to be played.
      * @param meta The track metadata to show in the player (DIDL format).
      */
-    void playUri(String uri, String meta);    
+    void playUri(std::string uri, std::string meta);
 
     /**
      * Play the currently selected track.
@@ -109,7 +114,7 @@ public:
      * Get the zone name of the Sonos speaker.
      * Note: If a speaker is joined with other speakers in the zone, only the group coordinator can perform actions
      */
-    String getZoneName(void);
+    std::string getZoneName(void);
 
     /**
      * Return if the Sonos is joined with another one.
@@ -129,7 +134,8 @@ private:
 
     // instance fields
     IPAddress m_ipAddress;
-    String m_uuid;
+    std::string m_uuid;
+    SonosUPnP m_sonosUPnP;
 };
 
 #endif //  SONOSDEVICE_H

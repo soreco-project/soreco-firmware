@@ -1,6 +1,7 @@
 #include "SerialCommands.h"
 
 #include <Arduino.h>
+#include <string>
 
 SerialCommands::SerialCommands(void) :
     m_argumentSavePtr(NULL),
@@ -25,8 +26,7 @@ void SerialCommands::loop(void) {
             if (token != NULL) {
                 for (int i = 0; i < m_numberOfCommands; i++) {
                     // Compare the found command against the list of known commands for a match
-                    String userCommand = token;
-                    if(userCommand.equalsIgnoreCase(m_commands[i].command)) {
+                    if(stricmp(token, m_commands[i].command) == 0) {
                         // Execute the stored handler function for the command
                         (*m_commands[i].function)(); 
                         commandFound = true;
