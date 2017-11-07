@@ -2,7 +2,7 @@
 #define SONOSDISCOVERY_H
 
 #include <Arduino.h>
-#include <WifiUdp.h>
+#include <WiFiUdp.h>
 #include <vector>
 #include <ESP8266WiFi.h>
 #include "SonosDevice.h"
