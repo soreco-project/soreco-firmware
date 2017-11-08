@@ -1,8 +1,8 @@
 #ifndef DEBUGCONSOLE_H
 #define DEBUGCONSOLE_H
 
-#include "WifiManager.h"
-#include "SonosDevice.h"
+#include "../WifiManager/WifiManager.h"
+#include "../Sonos/SonosDevice.h"
 
 /**
  * Command line interface for development to interact with the device.

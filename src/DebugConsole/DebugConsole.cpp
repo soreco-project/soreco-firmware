@@ -2,8 +2,8 @@
 
 #include <Arduino.h>
 #include "SerialCommands.h"
-#include "DeviceSettings.h"
-#include "SonosDiscovery.h"
+#include "../DeviceSettings/DeviceSettings.h"
+#include "../Sonos/SonosDiscovery.h"
 
 // Note: try to use flash strings to reduce RAM usage!
 // https://espressif.com/sites/default/files/documentation/save_esp8266ex_ram_with_progmem_en.pdf
@@ -135,7 +135,7 @@ void cmdWiFiConnect(void) {
 
 void cmdWiFiStartHotspot(void) {
     Serial.println(F("Starting WiFi hotspot for configuration"));
-    pWiFiManager->startConfigMode();
+    pWiFiManager->startConfigMode(DeviceSettings::getDeviceParameters().deviceSerialNumber);
 }
 
 void cmdWiFiStatusClient(void) {

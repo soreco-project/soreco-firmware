@@ -42,9 +42,10 @@ public:
     void loop(void);
 
     /**
-     * Set system into hotspot (access point) mode so an external device can connect for configuration. 
+     * Set system into hotspot (access point) mode so an external device can connect for configuration.
+     * Note: hotspot name = soreco-xyz (xyz = deviceSerialNumber)
      */
-    void startConfigMode(void);
+    void startConfigMode(const uint32_t deviceSerialNumber);
 
     /**
      * Set system into client mode so it can connect to the given WiFi.

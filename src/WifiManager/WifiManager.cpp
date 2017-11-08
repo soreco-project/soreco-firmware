@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "WifiManager.h"
-#include "DeviceSettings.h"
 
 const IPAddress localIp(192, 168, 4, 1);
 const IPAddress gateway(192, 168, 4, 1);
@@ -30,7 +29,7 @@ void WifiManager::loop(void) {
     }
 }
 
-void WifiManager::startConfigMode(void) {
+void WifiManager::startConfigMode(const uint32_t deviceSerialNumber) {
     // Intentionally disconnect so that ESP8266 knows clearly what we do and stops unrelated previous operations
     WiFi.softAPdisconnect();
     WiFi.disconnect();
@@ -41,7 +40,7 @@ void WifiManager::startConfigMode(void) {
 
     char ssid[32+1];
     memcpy(ssid, CONFIG_SSID_PREFIX, strlen(CONFIG_SSID_PREFIX));
-    itoa(DeviceSettings::getDeviceParameters().deviceSerialNumber, &ssid[strlen(CONFIG_SSID_PREFIX)], 10);
+    itoa(deviceSerialNumber, &ssid[strlen(CONFIG_SSID_PREFIX)], 10);
     
     // start config hotspot with device serial number as ssid (no password)
     WiFi.softAPConfig(localIp, gateway, subnet);

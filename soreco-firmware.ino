@@ -4,10 +4,10 @@
  *************************************************************************************************/
 
 #include <Arduino.h>
-#include "DebugConsole.h"
-#include "DeviceSettings.h"
-#include "WifiManager.h"
-#include "SonosDevice.h"
+#include "src/DebugConsole/DebugConsole.h"
+#include "src/DeviceSettings/DeviceSettings.h"
+#include "src/WifiManager/WifiManager.h"
+#include "src/Sonos/SonosDevice.h"
 
 const char* FIRMWARE_VERSION = "0.0.1";
 
@@ -36,7 +36,7 @@ void setup() {
     else {
         // only enter config mode when there is no stored network in DeviceSettings
         Serial.println(F("Starting WiFi hotspot for configuration"));
-        wifiManager.startConfigMode();
+        wifiManager.startConfigMode(DeviceSettings::getDeviceParameters().deviceSerialNumber);
     }
 }
 
