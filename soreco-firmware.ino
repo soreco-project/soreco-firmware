@@ -9,8 +9,13 @@
 #include "src/WifiManager/WifiManager.h"
 #include "src/Sonos/SonosDevice.h"
 
-const char* FIRMWARE_VERSION = "0.0.1";
+// for stack analysis
+extern "C" {
+    #include <cont.h>
+    extern cont_t g_cont;
+}
 
+const char* FIRMWARE_VERSION = "0.0.1";
 DebugConsole debugConsole;
 WifiManager wifiManager;
 SonosDevice sonosDevice;
@@ -22,6 +27,9 @@ void setup() {
     Serial.print(F("Firmware soreco V")); Serial.println(FIRMWARE_VERSION);
     Serial.print(F("Compiletime: ")); Serial.print(__TIME__); Serial.print(" "); Serial.println(__DATE__);
     Serial.print(F("ESP8266 SDK: ")); Serial.println(ESP.getSdkVersion());
+
+    Serial.print(F("Available stack: ")); Serial.println(cont_get_free_stack(&g_cont));
+    Serial.print(F("Available heap: ")); Serial.println(ESP.getFreeHeap());
 
     DeviceSettings::load();
     debugConsole.setup(wifiManager, sonosDevice);

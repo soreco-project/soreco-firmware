@@ -1,8 +1,10 @@
 #ifndef SONOSDEVICE_H
 #define SONOSDEVICE_H
 
+#include <Arduino.h>
+#include <string>
 #include <IPAddress.h>
-#include "SonosUPnP.h"
+#include <WiFiClient.h>
 
 /**
  * Representation of a Sonos device.
@@ -36,17 +38,17 @@ public:
     /**
      * Constructor with IP address and unique device identifier.
      */
-    SonosDevice(IPAddress ipAddress, std::string uuid);
+    SonosDevice(const IPAddress& ip, const std::string& uuid);
 
     /**
      * Update destination to the given IP address.
      */
-    void setIpAddress(IPAddress ipAddress);
+    void setIp(const IPAddress& ip);
 
     /**
      * Get the IP address of the sonos device.
      */
-    IPAddress getIpAddress(void);
+    IPAddress getIp(void);
 
     /**
      * Get the unique device identifier.
@@ -64,7 +66,7 @@ public:
      * @param uri URI of a stream to be played.
      * @param meta The track metadata to show in the player (DIDL format).
      */
-    void playUri(std::string uri, std::string meta);
+    void playUri(const std::string& uri, const std::string& meta);
 
     /**
      * Play the currently selected track.
@@ -133,9 +135,9 @@ public:
 private:
 
     // instance fields
-    IPAddress m_ipAddress;
+    IPAddress m_ip;
     std::string m_uuid;
-    SonosUPnP m_sonosUPnP;
+    WiFiClient m_client;
 };
 
-#endif //  SONOSDEVICE_H
+#endif // SONOSDEVICE_H

@@ -1,6 +1,7 @@
 #include "DebugConsole.h"
 
 #include <Arduino.h>
+#include <string.h>
 #include "SerialCommands.h"
 #include "../DeviceSettings/DeviceSettings.h"
 #include "../Sonos/SonosDiscovery.h"
@@ -188,7 +189,7 @@ void cmdSonosDiscover(void) {
     Serial.print(F("..done! (")); Serial.print(sonosDevices.size()); Serial.println(F(" devices found)"));
 
     for (int i = 0; i < sonosDevices.size(); i++) {
-        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(sonosDevices[i].getIpAddress());
+        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(sonosDevices[i].getIp());
         Serial.print(F(" (")); Serial.print(sonosDevices[i].getUUID().c_str()); Serial.println(F(")"));
     }
 }
@@ -196,9 +197,9 @@ void cmdSonosDiscover(void) {
 void cmdSonosConnect(void) {
     char* argument = serialCommands.getArgument();
     if (argument != NULL) {
-        IPAddress addr;
-        if (addr.fromString(argument)) {
-            pSonosDevice->setIpAddress(addr);
+        IPAddress ip;
+        if (ip.fromString(argument)) {
+            pSonosDevice->setIp(ip);
             return;
         }
     }
@@ -210,7 +211,7 @@ void cmdSonosPlayState(void) {
     if (argument == NULL) {
         // get
         SonosDevice::PlayState playState = pSonosDevice->getPlayState();
-        Serial.print(F("Play state = ")); 
+        Serial.print(F("Sonos play state = ")); 
         switch(playState) {
             case SonosDevice::PlayState::ERROR:
                 Serial.println(F("error"));
@@ -231,10 +232,10 @@ void cmdSonosPlayState(void) {
     }
     else {
         // set
-        if (stricmp(argument, "play") == 0) {
+        if (strcasecmp(argument, "play") == 0) {
             pSonosDevice->play();
         }
-        else if (stricmp(argument, "pause") == 0) {
+        else if (strcasecmp(argument, "pause") == 0) {
             pSonosDevice->pause();
         }
         else {

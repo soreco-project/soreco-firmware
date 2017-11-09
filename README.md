@@ -6,6 +6,8 @@ soreco is a hardware remote controller for Sonos wireless home sound system, whi
 
 ## Usage
 Open soreco-firmware.ino in Arduino and flash the NodeMCU 1.0 (ESP-12E Module).
+Note: Requires ESP8266 board package version 2.4.0-rc2.
+https://github.com/esp8266/Arduino#installing-with-boards-manager
 
 The debug console is currently the only way to interact with the device. There are the following commands available to interact with the device:
 * help (list all available commands)
