@@ -24,7 +24,7 @@ The debug console is currently the only way to interact with the device. There a
 * Sonos.Discover (scan and report all available Sonos devices)
 * Sonos.Connect (set Sonos device to control from debug console)
 * Sonos.PlayState (get / set the play state ('play' | 'pause') of the Sonos device)
-* Power.Sleep (set the power mode ('modem', 'light', '') if ESP8266)
+* Power.Mode (set the power mode ('modem', 'light', 'off') if ESP8266)
 
 ## Task List
 [Link to the Trello](https://trello.com/b/eYdj9IFY/firmware)
