@@ -248,7 +248,7 @@ void cmdSonosPlayState(void) {
     }
 }
 
-void cmdPowerModemSleep(void) {
+void cmdPowerSleep(void) {
     char* argument = serialCommands.getArgument();
     if (argument != NULL) {
         if (stricmp(argument, "modem") == 0) { // disable only Wifi chip
@@ -311,7 +311,7 @@ void DebugConsole::setup(WifiManager& wifiManager, SonosDevice& sonosDevice) {
     serialCommands.addCommand("Sonos.Discover", cmdSonosDiscover);
     serialCommands.addCommand("Sonos.Connect", cmdSonosConnect);
     serialCommands.addCommand("Sonos.PlayState", cmdSonosPlayState);
-    serialCommands.addCommand("Power.Sleep", cmdPowerModemSleep);
+    serialCommands.addCommand("Power.Sleep", cmdPowerSleep);
 }
 
 void DebugConsole::loop(void) {
