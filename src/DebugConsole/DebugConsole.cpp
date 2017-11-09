@@ -1,9 +1,14 @@
 #include "DebugConsole.h"
 
 #include <Arduino.h>
+
 #include "SerialCommands.h"
 #include "../DeviceSettings/DeviceSettings.h"
 #include "../Sonos/SonosDiscovery.h"
+
+extern "C" {
+    #include "user_interface.h"
+}
 
 // Note: try to use flash strings to reduce RAM usage!
 // https://espressif.com/sites/default/files/documentation/save_esp8266ex_ram_with_progmem_en.pdf
@@ -243,6 +248,43 @@ void cmdSonosPlayState(void) {
     }
 }
 
+void cmdPowerModemSleep(void) {
+    char* argument = serialCommands.getArgument();
+    if (argument != NULL) {
+        if (stricmp(argument, "modem") == 0) { // disable only Wifi chip
+            Serial.println(F("Wifi modem sleep"));
+            WiFi.disconnect();
+
+            wifi_set_opmode(NULL_MODE);
+            wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
+            wifi_fpm_open();
+            wifi_fpm_do_sleep(0xFFFFFFF); // longest possible sleep
+
+            delay(100); //For some reason the modem won't go to sleep unless you do a delay
+        } 
+        else if (stricmp(argument, "light") == 0) { // disable cpu and wifi chip, wakeup by GPIO
+            Serial.println(F("Wifi light sleep"));
+
+            wifi_set_opmode(NULL_MODE);
+            wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
+            wifi_fpm_open();
+            // TODO wakeup with GPIO -> gpio_pin_wakeup_enable            
+            wifi_fpm_do_sleep(0xFFFFFFF); // longest possible sleep
+
+            delay(100); //For some reason the modem won't go to sleep unless you do a delay
+        } 
+        else {
+            Serial.println(F("Wifi station mode"));
+
+            wifi_fpm_close();
+            wifi_set_opmode(STATION_MODE);
+            // TODO gpio_pin_wakeup_disable();
+        }
+    } else {
+        Serial.println(F("Argument required"));
+    }
+}
+
 DebugConsole::DebugConsole(void) {
 }
 
@@ -269,6 +311,7 @@ void DebugConsole::setup(WifiManager& wifiManager, SonosDevice& sonosDevice) {
     serialCommands.addCommand("Sonos.Discover", cmdSonosDiscover);
     serialCommands.addCommand("Sonos.Connect", cmdSonosConnect);
     serialCommands.addCommand("Sonos.PlayState", cmdSonosPlayState);
+    serialCommands.addCommand("Power.Sleep", cmdPowerModemSleep);
 }
 
 void DebugConsole::loop(void) {
