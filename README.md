@@ -26,7 +26,7 @@ The debug console is currently the only way to interact with the device. There a
 * Sonos.PlayState (get / set the play state ('play' | 'pause') of the Sonos device)
 
 ## System overview
-![Device State Machine](doc/Device State Machine.png)
+![Device State Machine](doc/Device%20State%20Machine.png)
 
 ## Task List
 [Link to the Trello](https://trello.com/b/eYdj9IFY/firmware)
