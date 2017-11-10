@@ -5,8 +5,8 @@
 #include <stdint.h>
 #include <string>
 #include <unordered_map>
-#include <WiFiClient.h>
 #include <IPAddress.h>
+#include <WiFiClient.h>
 
 /**
  * Helper class to create, execute and process the SOAP UPnP commands.
@@ -24,12 +24,12 @@ public:
     static SonosCommandBuilder zoneGroupTopology(const std::string& action);
 
     SonosCommandBuilder& put(const std::string& key, std::string value);
-    std::string executeOn(const IPAddress& ip, WiFiClient& client);
+    std::string executeOn(const IPAddress& ip);
 
 private:
 
     // constants
-    static const uint16_t UPNP_PORT = 1400;
+    static const uint16_t SOAP_PORT = 1400;
     static const char* TRANSPORT_ENDPOINT;
     static const char* TRANSPORT_SERVICE;
     static const char* RENDERING_ENDPOINT;
@@ -57,8 +57,7 @@ private:
     SonosCommandBuilder& operator=(const SonosCommandBuilder&);
 
     std::string getBody(void);
-    bool isEscaped(const std::string& s);
-    void escapeXml11(std::string& s);
+    void readResponse(WiFiClient* stream, std::string& result);
 
     // instance members
     std::string m_endpoint;

@@ -1,7 +1,7 @@
 #include "SonosCommandBuilder.h"
 
-#include <vector>
-#include <algorithm>
+#include <ESP8266HTTPClient.h>
+#include "XmlStringEscapeUtils.h"
 
 // static initialization
 const char* SonosCommandBuilder::TRANSPORT_ENDPOINT             = "/MediaRenderer/AVTransport/Control";
@@ -42,72 +42,38 @@ SonosCommandBuilder SonosCommandBuilder::zoneGroupTopology(const std::string& ac
 }
 
 SonosCommandBuilder& SonosCommandBuilder::put(const std::string& key, std::string value) {
-    if(!isEscaped(value)) {
-        escapeXml11(value);
+    if(!XmlStringEscapeUtils::isXml11Escaped(value)) {
+        XmlStringEscapeUtils::escapeXml11(value);
     }
     m_bodyEntries.insert({key, value});
     return *this;
 }
 
-std::string SonosCommandBuilder::executeOn(const IPAddress& ip, WiFiClient& client) {
-    if (client.connect(ip, UPNP_PORT)) {
-        std::string arguments = getBody();
-        Serial.println(F("FIXME: SonosCommandBuilder - verify contentLength with Wireshark"));
-        int contentLength = 246 + m_service.length() + m_action.length() + m_action.length() + m_service.length() + arguments.length() + m_action.length();
+std::string SonosCommandBuilder::executeOn(const IPAddress& ip) {
+    HTTPClient httpClient;
+    if (httpClient.begin(ip.toString(), SOAP_PORT, m_endpoint.c_str())) {
+        // Note: this is highly inefficient, but for strange reasons the std::stringstream can't be used here due to linker errors once including <sstream>
+        std::string content = "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:";
+        content += m_action;
+        content += " xmlns:u=\"";
+        content += m_service;
+        content += "\">";
+        content += getBody();
+        content += "</u:";
+        content += m_action;
+        content += "></s:Body></s:Envelope>";
 
-        client.print(F("POST "));
-        client.print(m_endpoint.c_str());
-        client.println(F("HTTP/1.1"));
-        client.print(F("Host: "));
-        client.println(ip);
-        client.print(F("Content-Length: "));
-        client.println(contentLength);
-        client.println(F("Content-Type: text/xml; charset=utf-8"));
-        client.print(F("Soapaction: "));
-        client.print(m_service.c_str());
-        client.print(F("#"));
-        client.println(m_action.c_str());
-        client.println(F("Connection: close"));
-        client.println("");
-        client.print(F("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\""));
-        client.print(F("s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"));
-        client.print(F("<s:Body>"));
-        client.print(F("<u:"));
-        client.print(m_action.c_str());
-        client.print(F(" xmlns:u=\""));
-        client.print(m_service.c_str());
-        client.print(F("\">"));
-        client.print(arguments.c_str());
-        client.print(F("</u:"));
-        client.print(m_action.c_str());
-        client.print(F(">"));
-        client.print(F("</s:Body>"));
-        client.println(F("</s:Envelope>"));
+        httpClient.addHeader("Content-Type", "text/xml; charset=utf-8");
+        std::string soapHeader = m_service + "#" + m_action;
+        httpClient.addHeader("SOAPACTION", soapHeader.c_str());
 
-        //wait if client is not immediately available
-        unsigned long starttimer = millis();
-        const unsigned long timelimit = 10000;
-        bool timeout = false;
-        while (!client.available() && !timeout) {
-            //wait until client available
-            delay(100);
-            if ((millis() - starttimer) > timelimit) {
-                timeout = true;
-            }
-        }
-        //timeout shall keep current state for the coming while-loop. Only starttimer should be updated
-        starttimer = millis();
+        // perform the actual request
+        httpClient.POST(content.c_str());
+        httpClient.writeToStream(&Serial);
+
+        // read response
         std::string result;
-        while (client.available() && !timeout) {
-            const char c = client.read();
-            result.append(&c);
-            if ((millis() - starttimer) > timelimit) {
-                timeout = true;
-            }
-        }
-        if (timeout) {
-            client.stop();
-        }
+        readResponse(httpClient.getStreamPtr(), result);
         return result;
     }
     Serial.print(F("ERROR: Sonos - unable to connect to ")); Serial.println(ip);
@@ -122,36 +88,27 @@ std::string SonosCommandBuilder::getBody(void) {
     return str;
 }
 
-bool SonosCommandBuilder::isEscaped(const std::string& s) {
-    std::vector<std::string> escapeList {"&amp;", "&lt;", "&gt;", "&quot;", "&apos;"};
-    return std::find(escapeList.begin(), escapeList.end(), s) != escapeList.end();
-}
-
-void SonosCommandBuilder::escapeXml11(std::string& s) {
-    // we expect less than 5% to be escaped
-    std::string buffer;
-    buffer.reserve(s.length() * 1.05);
-    for(size_t i = 0; i != s.length(); ++i) {
-        switch(s[i]) {
-            case '&':
-                buffer.append("&amp;");
-                break;
-                case '<':
-                buffer.append("&lt;");
-                break;
-            case '>':
-                buffer.append("&gt;");
-                break;
-            case '\"':
-                buffer.append("&quot;");
-                break;
-            case '\'':
-                buffer.append("&apos;");
-                break;
-            default:
-                buffer.append(&s[i], 1);
-                break;
+void SonosCommandBuilder::readResponse(WiFiClient* stream, std::string& result) {
+    const unsigned long timeLimitMs = 2000;
+    bool isTimedOut = false;
+    unsigned long startTimeMs = millis();
+    while (!stream->available() && !isTimedOut) {
+        //wait until available
+        delay(10);
+        if ((millis() - startTimeMs) > timeLimitMs) {
+            isTimedOut = true;
         }
     }
-    s.swap(buffer);
+    // we have now a connection, reset timeout to wait again for all data
+    startTimeMs = millis();
+    while (stream->available() && !isTimedOut) {
+        const char c = stream->read();
+        result.append(&c);
+        if ((millis() - startTimeMs) > timeLimitMs) {
+            isTimedOut = true;
+        }
+    }
+    if (isTimedOut) {
+        stream->stop();
+    }
 }

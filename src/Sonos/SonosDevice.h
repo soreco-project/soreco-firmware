@@ -137,7 +137,6 @@ private:
     // instance fields
     IPAddress m_ip;
     std::string m_uuid;
-    WiFiClient m_client;
 };
 
 #endif // SONOSDEVICE_H

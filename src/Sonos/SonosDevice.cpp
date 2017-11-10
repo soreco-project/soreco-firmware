@@ -29,28 +29,28 @@ SonosDevice::PlayState SonosDevice::getPlayState(void) {
 }
 
 void SonosDevice::playUri(const std::string& uri, const std::string& meta) {
-    SonosCommandBuilder::transport("SetAVTransportURI").put("InstanceID", "0").put("CurrentURI", uri).put("CurrentURIMetaData", meta).executeOn(m_ip, m_client);
+    SonosCommandBuilder::transport("SetAVTransportURI").put("InstanceID", "0").put("CurrentURI", uri).put("CurrentURIMetaData", meta).executeOn(m_ip);
     play();
 }
 
 void SonosDevice::play(void) {
-    SonosCommandBuilder::transport("Play").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip, m_client);
+    SonosCommandBuilder::transport("Play").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip);
 }
 
 void SonosDevice::pause(void) {
-    SonosCommandBuilder::transport("Pause").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip, m_client);
+    SonosCommandBuilder::transport("Pause").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip);
 }
 
 void SonosDevice::next(void) {
-    SonosCommandBuilder::transport("Next").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip, m_client);
+    SonosCommandBuilder::transport("Next").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip);
 }
 
 void SonosDevice::previous(void) {
-    SonosCommandBuilder::transport("Previous").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip, m_client);
+    SonosCommandBuilder::transport("Previous").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip);
 }
 
 void SonosDevice::setVolume(int volume) {
     std::stringstream ss;
     ss << volume;
-    SonosCommandBuilder::rendering("SetVolume").put("InstanceID", "0").put("Channel", "Master").put("DesiredVolume", ss.str()).executeOn(m_ip, m_client);
+    SonosCommandBuilder::rendering("SetVolume").put("InstanceID", "0").put("Channel", "Master").put("DesiredVolume", ss.str()).executeOn(m_ip);
 }
