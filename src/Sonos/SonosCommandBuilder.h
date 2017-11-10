@@ -57,7 +57,7 @@ private:
     SonosCommandBuilder& operator=(const SonosCommandBuilder&);
 
     std::string getBody(void);
-    void readResponse(WiFiClient* stream, std::string& result);
+    void readResponse(WiFiClient& stream, std::string& result);
 
     // instance members
     std::string m_endpoint;

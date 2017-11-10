@@ -26,6 +26,10 @@ std::string SonosDevice::getUUID(void) {
 }
 
 SonosDevice::PlayState SonosDevice::getPlayState(void) {
+    std::string r = SonosCommandBuilder::transport("GetTransportInfo").put("InstanceID", "0").executeOn(m_ip);
+    //TODO: parse response
+    //return PlayState.valueOf(ParserHelper.findOne("<CurrentTransportState>(.*)</CurrentTransportState>", r));
+    return PlayState::ERROR;
 }
 
 void SonosDevice::playUri(const std::string& uri, const std::string& meta) {

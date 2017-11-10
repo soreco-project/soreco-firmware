@@ -68,13 +68,12 @@ std::string SonosCommandBuilder::executeOn(const IPAddress& ip) {
         httpClient.addHeader("SOAPACTION", soapHeader.c_str());
 
         // perform the actual request
-        httpClient.POST(content.c_str());
-        httpClient.writeToStream(&Serial);
-
-        // read response
-        std::string result;
-        readResponse(httpClient.getStreamPtr(), result);
-        return result;
+        int httpCode = httpClient.POST(content.c_str());
+        if (httpCode == HTTP_CODE_OK) {
+            std::string result;
+            readResponse(httpClient.getStream(), result);
+            return result;
+        }
     }
     Serial.print(F("ERROR: Sonos - unable to connect to ")); Serial.println(ip);
     return "";
@@ -88,11 +87,12 @@ std::string SonosCommandBuilder::getBody(void) {
     return str;
 }
 
-void SonosCommandBuilder::readResponse(WiFiClient* stream, std::string& result) {
-    const unsigned long timeLimitMs = 2000;
+void SonosCommandBuilder::readResponse(WiFiClient& stream, std::string& result) {
+    // TODO: wait until end of response instead of waiting for a timeout
+    const unsigned long timeLimitMs = 1000;
     bool isTimedOut = false;
     unsigned long startTimeMs = millis();
-    while (!stream->available() && !isTimedOut) {
+    while (!stream.available() && !isTimedOut) {
         //wait until available
         delay(10);
         if ((millis() - startTimeMs) > timeLimitMs) {
@@ -101,14 +101,14 @@ void SonosCommandBuilder::readResponse(WiFiClient* stream, std::string& result) 
     }
     // we have now a connection, reset timeout to wait again for all data
     startTimeMs = millis();
-    while (stream->available() && !isTimedOut) {
-        const char c = stream->read();
+    while (stream.available() && !isTimedOut) {
+        const char c = stream.read();
         result.append(&c);
         if ((millis() - startTimeMs) > timeLimitMs) {
             isTimedOut = true;
         }
     }
     if (isTimedOut) {
-        stream->stop();
+        stream.stop();
     }
 }
