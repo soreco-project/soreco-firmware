@@ -103,7 +103,7 @@ void SonosCommandBuilder::readResponse(WiFiClient& stream, std::string& result) 
     startTimeMs = millis();
     while (stream.available() && !isTimedOut) {
         const char c = stream.read();
-        result.append(&c);
+        result += c;
         if ((millis() - startTimeMs) > timeLimitMs) {
             isTimedOut = true;
         }

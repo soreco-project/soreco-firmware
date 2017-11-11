@@ -2,6 +2,13 @@
 
 #include <sstream>
 #include "SonosCommandBuilder.h"
+#include "SonosResponseParser.h"
+
+// static initialization
+std::unordered_map<std::string, SonosDevice::PlayState::Id> SonosDevice::PlayState::s_valueMap {
+    {"ERROR", PlayState::Id::ERROR}, {"STOPPED", PlayState::Id::STOPPED},
+    {"PLAYING", PlayState::Id::PLAYING}, {"PAUSED_PLAYBACK", PlayState::Id::PAUSED_PLAYBACK},
+    {"TRANSITIONING", PlayState::Id::TRANSITIONING}};
 
 SonosDevice::SonosDevice(void) {
 }
@@ -25,11 +32,9 @@ std::string SonosDevice::getUUID(void) {
     return m_uuid;
 }
 
-SonosDevice::PlayState SonosDevice::getPlayState(void) {
+SonosDevice::PlayState::Id SonosDevice::getPlayState(void) {
     std::string r = SonosCommandBuilder::transport("GetTransportInfo").put("InstanceID", "0").executeOn(m_ip);
-    //TODO: parse response
-    //return PlayState.valueOf(ParserHelper.findOne("<CurrentTransportState>(.*)</CurrentTransportState>", r));
-    return PlayState::ERROR;
+    return PlayState::valueOf(SonosResponseParser::findOne("<CurrentTransportState>", "</CurrentTransportState>", r));
 }
 
 void SonosDevice::playUri(const std::string& uri, const std::string& meta) {

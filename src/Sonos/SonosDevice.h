@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <string>
+#include <unordered_map>
 #include <IPAddress.h>
 #include <WiFiClient.h>
 
@@ -17,17 +18,34 @@ public:
     /**
      * List of possible play states.
      */
-    enum PlayState {
-        // Player has an error
-        ERROR = 0,
-        // Player is stopped
-        STOPPED = 1,
-        // Player is playing
-        PLAYING = 2,
-        // Player is paused
-        PAUSED_PLAYBACK = 3,
-        // Player is loading
-        TRANSITIONING = 4
+    struct PlayState {
+        enum Id {
+            // Player has an error
+            ERROR = 0,
+            // Player is stopped
+            STOPPED = 1,
+            // Player is playing
+            PLAYING = 2,
+            // Player is paused
+            PAUSED_PLAYBACK = 3,
+            // Player is loading
+            TRANSITIONING = 4
+        };
+
+        static PlayState::Id valueOf(const std::string& s) {
+            return s_valueMap.at(s);
+        }
+
+        static std::string toString(const PlayState::Id value) {
+            for (auto it = s_valueMap.begin(); it != s_valueMap.end(); ++it) {
+                if (it->second == value) {
+                    return it->first;
+                }
+            }
+            return "";
+        }
+
+        static std::unordered_map<std::string, PlayState::Id> s_valueMap;
     };
 
     /**
@@ -59,7 +77,7 @@ public:
      * Get the play state of the device.
      * @return current PlayState of the device
      */
-    PlayState getPlayState(void);
+    PlayState::Id getPlayState(void);
 
     /**
      * Play a given stream. Pauses the queue.
