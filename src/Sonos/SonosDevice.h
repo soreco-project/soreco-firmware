@@ -1,8 +1,11 @@
 #ifndef SONOSDEVICE_H
 #define SONOSDEVICE_H
 
+#include <Arduino.h>
+#include <string>
+#include <unordered_map>
 #include <IPAddress.h>
-#include "SonosUPnP.h"
+#include <WiFiClient.h>
 
 /**
  * Representation of a Sonos device.
@@ -15,17 +18,34 @@ public:
     /**
      * List of possible play states.
      */
-    enum PlayState {
-        // Player has an error
-        ERROR = 0,
-        // Player is stopped
-        STOPPED = 1,
-        // Player is playing
-        PLAYING = 2,
-        // Player is paused
-        PAUSED_PLAYBACK = 3,
-        // Player is loading
-        TRANSITIONING = 4
+    struct PlayState {
+        enum Id {
+            // Player has an error
+            ERROR = 0,
+            // Player is stopped
+            STOPPED = 1,
+            // Player is playing
+            PLAYING = 2,
+            // Player is paused
+            PAUSED_PLAYBACK = 3,
+            // Player is loading
+            TRANSITIONING = 4
+        };
+
+        static PlayState::Id valueOf(const std::string& s) {
+            return s_valueMap.at(s);
+        }
+
+        static std::string toString(const PlayState::Id value) {
+            for (auto it = s_valueMap.begin(); it != s_valueMap.end(); ++it) {
+                if (it->second == value) {
+                    return it->first;
+                }
+            }
+            return "";
+        }
+
+        static std::unordered_map<std::string, PlayState::Id> s_valueMap;
     };
 
     /**
@@ -36,17 +56,17 @@ public:
     /**
      * Constructor with IP address and unique device identifier.
      */
-    SonosDevice(IPAddress ipAddress, std::string uuid);
+    SonosDevice(const IPAddress& ip, const std::string& uuid);
 
     /**
      * Update destination to the given IP address.
      */
-    void setIpAddress(IPAddress ipAddress);
+    void setIp(const IPAddress& ip);
 
     /**
      * Get the IP address of the sonos device.
      */
-    IPAddress getIpAddress(void);
+    IPAddress getIp(void);
 
     /**
      * Get the unique device identifier.
@@ -57,14 +77,14 @@ public:
      * Get the play state of the device.
      * @return current PlayState of the device
      */
-    PlayState getPlayState(void);
+    PlayState::Id getPlayState(void);
 
     /**
      * Play a given stream. Pauses the queue.
      * @param uri URI of a stream to be played.
      * @param meta The track metadata to show in the player (DIDL format).
      */
-    void playUri(std::string uri, std::string meta);
+    void playUri(const std::string& uri, const std::string& meta);
 
     /**
      * Play the currently selected track.
@@ -133,9 +153,8 @@ public:
 private:
 
     // instance fields
-    IPAddress m_ipAddress;
+    IPAddress m_ip;
     std::string m_uuid;
-    SonosUPnP m_sonosUPnP;
 };
 
-#endif //  SONOSDEVICE_H
+#endif // SONOSDEVICE_H

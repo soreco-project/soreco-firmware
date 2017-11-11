@@ -1,61 +1,65 @@
 #include "SonosDevice.h"
 
-void onEthernetConnectionError(void) {
-    // TODO
+#include <sstream>
+#include "SonosCommandBuilder.h"
+#include "SonosResponseParser.h"
+
+// static initialization
+std::unordered_map<std::string, SonosDevice::PlayState::Id> SonosDevice::PlayState::s_valueMap {
+    {"ERROR", PlayState::Id::ERROR}, {"STOPPED", PlayState::Id::STOPPED},
+    {"PLAYING", PlayState::Id::PLAYING}, {"PAUSED_PLAYBACK", PlayState::Id::PAUSED_PLAYBACK},
+    {"TRANSITIONING", PlayState::Id::TRANSITIONING}};
+
+SonosDevice::SonosDevice(void) {
 }
 
-SonosDevice::SonosDevice(void) :
-    m_sonosUPnP(onEthernetConnectionError)
+SonosDevice::SonosDevice(const IPAddress& ip, const std::string& uuid) :
+    m_ip(ip),
+    m_uuid(uuid)
 {
 }
 
-SonosDevice::SonosDevice(IPAddress ipAddress, std::string uuid) :
-    m_ipAddress(ipAddress),
-    m_uuid(uuid),
-    m_sonosUPnP(onEthernetConnectionError)
-{
-}
-
-void SonosDevice::setIpAddress(IPAddress ipAddress) {
-    m_ipAddress = ipAddress;
+void SonosDevice::setIp(const IPAddress& ip) {
+    m_ip = ip;
     // TODO: get UUID from device
 }
 
-IPAddress SonosDevice::getIpAddress(void) {
-    return m_ipAddress;
+IPAddress SonosDevice::getIp(void) {
+    return m_ip;
 }
 
 std::string SonosDevice::getUUID(void) {
     return m_uuid;
 }
 
-SonosDevice::PlayState SonosDevice::getPlayState(void) {
-    const uint8_t playState = m_sonosUPnP.getState(m_ipAddress);
-    switch (playState) {
-        case SONOS_STATE_ERROR:
-            return SonosDevice::PlayState::ERROR;
-        case SONOS_STATE_STOPPED:
-            return SonosDevice::PlayState::STOPPED;
-        case SONOS_STATE_PLAYING:
-            return SonosDevice::PlayState::PLAYING;
-        case SONOS_STATE_PAUSED:
-            return SonosDevice::PlayState::PAUSED_PLAYBACK;
-        case SONOS_STATE_TRANSITIONING:
-            return SonosDevice::PlayState::TRANSITIONING;
-        default:
-            return SonosDevice::PlayState::STOPPED;
-    }
+SonosDevice::PlayState::Id SonosDevice::getPlayState(void) {
+    std::string r = SonosCommandBuilder::transport("GetTransportInfo").put("InstanceID", "0").executeOn(m_ip);
+    return PlayState::valueOf(SonosResponseParser::findOne("<CurrentTransportState>", "</CurrentTransportState>", r));
 }
 
-void SonosDevice::playUri(std::string uri, std::string meta) {
-    m_sonosUPnP.playUri(m_ipAddress, uri.c_str());
+void SonosDevice::playUri(const std::string& uri, const std::string& meta) {
+    SonosCommandBuilder::transport("SetAVTransportURI").put("InstanceID", "0").put("CurrentURI", uri).put("CurrentURIMetaData", meta).executeOn(m_ip);
+    play();
 }
-
 
 void SonosDevice::play(void) {
-    m_sonosUPnP.play(m_ipAddress);
+    SonosCommandBuilder::transport("Play").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip);
 }
 
 void SonosDevice::pause(void) {
-    m_sonosUPnP.pause(m_ipAddress);
+    SonosCommandBuilder::transport("Pause").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip);
+}
+
+void SonosDevice::next(void) {
+    SonosCommandBuilder::transport("Next").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip);
+}
+
+void SonosDevice::previous(void) {
+    SonosCommandBuilder::transport("Previous").put("InstanceID", "0").put("Speed", "1").executeOn(m_ip);
+}
+
+void SonosDevice::setVolume(int volume) {
+    std::stringstream ss;
+    ss << volume;
+    SonosCommandBuilder::rendering("SetVolume").put("InstanceID", "0").put("Channel", "Master").put("DesiredVolume", ss.str()).executeOn(m_ip);
 }
