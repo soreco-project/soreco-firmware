@@ -33,6 +33,6 @@ void setup() {
 
 void loop() {
     debugConsole.loop();
-    wifiManager.loop();
+    wifiManager.loop(); // TODO move to state machine
     deviceStateMachine.runStateMachine();
 }
