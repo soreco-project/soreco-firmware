@@ -248,6 +248,7 @@ void cmdSonosPlayState(void) {
     }
 }
 
+// See https://www.espressif.com/sites/default/files/9b-esp8266-low_power_solutions_en_0.pdf for more information
 void cmdPowerMode(void) {
     char* argument = serialCommands.getArgument();
     if (argument != NULL) {
