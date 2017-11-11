@@ -1,6 +1,9 @@
 # soreco-firmware
 Firmware for soreco Sonos Remote Control.
-soreco is a hardware remote controller for Sonos wireless home sound system, which is currently in development.
+![Hardware Preview](doc/soreco_hardware_preview.jpeg)
+
+soreco is an open source hardware platform to build a remote controller for Sonos wireless home sound system.
+The system is currently under development.
 
 [![Build Status](https://travis-ci.org/soreco-project/soreco-firmware.svg?branch=develop)](https://travis-ci.org/soreco-project/soreco-firmware)
 
