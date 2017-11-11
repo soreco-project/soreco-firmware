@@ -8,12 +8,14 @@
 #include "src/DeviceSettings/DeviceSettings.h"
 #include "src/WifiManager/WifiManager.h"
 #include "src/Sonos/SonosDevice.h"
+#include "src/DeviceState/DeviceStateMachine.h"
 
 const char* FIRMWARE_VERSION = "0.0.1";
 
 DebugConsole debugConsole;
 WifiManager wifiManager;
 SonosDevice sonosDevice;
+DeviceStateMachine deviceStateMachine(wifiManager, sonosDevice);
 
 void setup() {
     // // Note: try to use flash strings to reduce RAM usage!
@@ -26,21 +28,11 @@ void setup() {
     DeviceSettings::load();
     debugConsole.setup(wifiManager, sonosDevice);
     wifiManager.setup();
-
-    // TODO: move to DeviceStateMachine
-    DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
-    if (wifiConfig.isConfigured()) {
-        Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
-        wifiManager.startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
-    }
-    else {
-        // only enter config mode when there is no stored network in DeviceSettings
-        Serial.println(F("Starting WiFi hotspot for configuration"));
-        wifiManager.startConfigMode(DeviceSettings::getDeviceParameters().deviceSerialNumber);
-    }
+    deviceStateMachine.resetStateMachine();
 }
 
 void loop() {
     debugConsole.loop();
     wifiManager.loop();
+    deviceStateMachine.runStateMachine();
 }

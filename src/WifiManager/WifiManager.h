@@ -50,12 +50,17 @@ public:
     /**
      * Set system into client mode so it can connect to the given WiFi.
      */
-    void startClientMode(char* ssid, char* passphrase);
+    void startClientMode(const char* ssid, const char* passphrase);
 
     /**
      * Scans and returns the available WiFi networks.
      */
     std::vector<WiFiNetwork> scanForNetworks(void);
+
+    /**
+     * Returns true if wifi module is connected to an access point 
+     */
+    bool isWifiConnected(void) const;
 
 private:
     /**

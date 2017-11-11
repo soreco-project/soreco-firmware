@@ -29,6 +29,10 @@ void WifiManager::loop(void) {
     }
 }
 
+bool WifiManager::isWifiConnected(void) const {
+    return WiFi.status() == WL_CONNECTED;
+}
+
 void WifiManager::startConfigMode(const uint32_t deviceSerialNumber) {
     // Intentionally disconnect so that ESP8266 knows clearly what we do and stops unrelated previous operations
     WiFi.softAPdisconnect();
@@ -56,7 +60,7 @@ void WifiManager::startConfigMode(const uint32_t deviceSerialNumber) {
     }
 }
 
-void WifiManager::startClientMode(char* ssid, char* passphrase) {
+void WifiManager::startClientMode(const char* ssid, const char* passphrase) {
     // Intentionally disconnect so that ESP8266 knows clearly what we do and stops unrelated previous operations
     WiFi.softAPdisconnect();
     WiFi.disconnect();
