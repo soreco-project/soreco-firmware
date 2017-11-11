@@ -4,6 +4,7 @@
  *************************************************************************************************/
 
 #include <Arduino.h>
+#include "src/SystemInitializeDriver.h"
 #include "src/DebugConsole/DebugConsole.h"
 #include "src/DeviceSettings/DeviceSettings.h"
 #include "src/WifiManager/WifiManager.h"
@@ -32,6 +33,8 @@ void setup() {
 
     Serial.print(F("Available stack: ")); Serial.println(cont_get_free_stack(&g_cont));
     Serial.print(F("Available heap: ")); Serial.println(ESP.getFreeHeap());
+
+    SystemInitializeDriver::initPinConfig();
 
     DeviceSettings::load();
     debugConsole.setup(wifiManager, sonosDevice);

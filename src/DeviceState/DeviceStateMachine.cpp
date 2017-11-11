@@ -100,6 +100,8 @@ void DeviceStateMachine::onRunState(const StateMachineState state) {
 		case StateMachineState_Hotspot_Idle:
 			break;
 		case StateMachineState_Idle:
+			// TODO move as a const into SystemInitilizeDrivere
+			digitalWrite(2, LOW);
 			break;
 		default:
 			break;
