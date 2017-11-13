@@ -51,21 +51,6 @@ SonosDevice SonosDiscovery::discoverByUID(const uint16_t timeoutMs, const std::s
     return SonosDevice();
 }
 
-SonosDevice SonosDiscovery::discoverByName(const uint16_t timeoutMs, const std::string& name) {
-    std::vector<SonosDevice> sonosDevices = SonosDiscovery::discover(timeoutMs);
-    for(SonosDevice sonosDevice : sonosDevices) {
-        std::string zoneName = sonosDevice.getRoomName();
-        if(strcasecmp(name.c_str(), zoneName.c_str()) == 0) {
-            // name matches, check if it's actually the coordinator
-            if (sonosDevice.isCoordinator()) {
-                return sonosDevice;
-            }
-        }
-    }
-    // TODO: error handling
-    return SonosDevice();
-}
-
 void SonosDiscovery::processResponse(WiFiUDP& udpClient, std::vector<SonosDevice>& deviceList) {
     int packetSize = udpClient.parsePacket();
     if(packetSize > 0) {

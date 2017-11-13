@@ -29,8 +29,6 @@ public:
      */
     static SonosDevice discoverByUID(const uint16_t timeoutMs, const std::string& uid);
 
-    static SonosDevice discoverByName(const uint16_t timeoutMs, const std::string& name);
-
 private:
 
     // SSDP port (Simple Service Discovery Protocol)
