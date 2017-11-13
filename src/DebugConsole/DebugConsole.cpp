@@ -189,8 +189,15 @@ void cmdSonosDiscover(void) {
     Serial.print(F("..done! (")); Serial.print(sonosDevices.size()); Serial.println(F(" devices found)"));
 
     for (int i = 0; i < sonosDevices.size(); i++) {
-        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(sonosDevices[i].getIp());
-        Serial.print(F(" (")); Serial.print(sonosDevices[i].getUUID().c_str()); Serial.println(F(")"));
+        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(sonosDevices[i].getRoomName().c_str());
+        Serial.print(F(" (")); Serial.print(sonosDevices[i].getIp());
+        if (sonosDevices[i].isJoined()) {
+            Serial.print(F(", joined"));
+        }
+        if (sonosDevices[i].isCoordinator()) {
+            Serial.print(F(", coordinator"));
+        }
+        Serial.println(F(")"));
     }
 }
 

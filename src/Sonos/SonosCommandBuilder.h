@@ -16,6 +16,7 @@ class SonosCommandBuilder {
 public:
 
     SonosCommandBuilder(const std::string& endpoint, const std::string& service, const std::string& action);
+    static std::string getDeviceDescription(const IPAddress& ip);
 
     static SonosCommandBuilder transport(const std::string& action);
     static SonosCommandBuilder rendering(const std::string& action);

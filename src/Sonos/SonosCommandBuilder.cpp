@@ -21,6 +21,20 @@ SonosCommandBuilder::SonosCommandBuilder(const std::string& endpoint, const std:
     m_action = action;
 }
 
+
+std::string SonosCommandBuilder::getDeviceDescription(const IPAddress& ip) {
+    HTTPClient httpClient;
+    std::string response;
+    if (httpClient.begin(ip.toString(), SOAP_PORT, "/xml/device_description.xml")) {
+        int httpCode = httpClient.GET();
+        if (httpCode == HTTP_CODE_OK) {
+            String payLoad = httpClient.getString();
+            return payLoad.c_str();
+        }
+    }
+    return response;
+}
+
 SonosCommandBuilder SonosCommandBuilder::transport(const std::string& action) {
     return SonosCommandBuilder(TRANSPORT_ENDPOINT, TRANSPORT_SERVICE, action);
 }

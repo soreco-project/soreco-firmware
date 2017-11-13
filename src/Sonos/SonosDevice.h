@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <IPAddress.h>
 #include <WiFiClient.h>
+#include "SonosZoneInfo.h"
 
 /**
  * Representation of a Sonos device.
@@ -54,9 +55,9 @@ public:
     SonosDevice(void);
 
     /**
-     * Constructor with IP address and unique device identifier.
+     * Constructor with IP address.
      */
-    SonosDevice(const IPAddress& ip, const std::string& uuid);
+    SonosDevice(const IPAddress& ip);
 
     /**
      * Update destination to the given IP address.
@@ -67,11 +68,6 @@ public:
      * Get the IP address of the sonos device.
      */
     IPAddress getIp(void);
-
-    /**
-     * Get the unique device identifier.
-     */
-    std::string getUUID(void);
 
     /**
      * Get the play state of the device.
@@ -131,10 +127,9 @@ public:
     void setMute(bool state);
 
     /**
-     * Get the zone name of the Sonos speaker.
-     * Note: If a speaker is joined with other speakers in the zone, only the group coordinator can perform actions
+     * Get the room name of the Sonos speaker.
      */
-    std::string getZoneName(void);
+    std::string getRoomName(void);
 
     /**
      * Return if the Sonos is joined with another one.
@@ -142,6 +137,11 @@ public:
      * @return True if is joined, false if is isn't
      */
     bool isJoined(void);
+
+    /**
+     * 
+     */
+    SonosZoneInfo getZoneGroupState(void);
 
     /**
      * Check if the speaker is a group coordinator or not.
@@ -154,7 +154,6 @@ private:
 
     // instance fields
     IPAddress m_ip;
-    std::string m_uuid;
 };
 
 #endif // SONOSDEVICE_H

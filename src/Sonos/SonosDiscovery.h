@@ -22,6 +22,15 @@ public:
      */
     static std::vector<SonosDevice> discover(const uint16_t timeoutMs);
 
+    /**
+     * Discover one Sonos speakers on network using SSDP (Simple Service Discovery Protocol) by UID.
+     * @param timeOutMs discovery timeout in milliseconds
+     * @param uid Sonos Speaker UID
+     */
+    static SonosDevice discoverByUID(const uint16_t timeoutMs, const std::string& uid);
+
+    static SonosDevice discoverByName(const uint16_t timeoutMs, const std::string& name);
+
 private:
 
     // SSDP port (Simple Service Discovery Protocol)

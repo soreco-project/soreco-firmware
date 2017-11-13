@@ -30,7 +30,6 @@ void setup() {
     Serial.print(F("Firmware soreco V")); Serial.println(FIRMWARE_VERSION);
     Serial.print(F("Compiletime: ")); Serial.print(__TIME__); Serial.print(" "); Serial.println(__DATE__);
     Serial.print(F("ESP8266 SDK: ")); Serial.println(ESP.getSdkVersion());
-
     Serial.print(F("Available stack: ")); Serial.println(cont_get_free_stack(&g_cont));
     Serial.print(F("Available heap: ")); Serial.println(ESP.getFreeHeap());
 
