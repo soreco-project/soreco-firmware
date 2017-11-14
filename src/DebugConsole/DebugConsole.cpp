@@ -5,6 +5,7 @@
 #include "SerialCommands.h"
 #include "../DeviceSettings/DeviceSettings.h"
 #include "../Sonos/SonosDiscovery.h"
+#include "../Sonos/SonosCommandBuilder.h"
 
 // Note: try to use flash strings to reduce RAM usage!
 // https://espressif.com/sites/default/files/documentation/save_esp8266ex_ram_with_progmem_en.pdf
@@ -32,7 +33,7 @@ void cmdConfigFactoryDefaults(void) {
 
 void cmdConfigSerialNumber(void) {
     DeviceSettings::DeviceParameters config = DeviceSettings::getDeviceParameters();
-    char* argument = serialCommands.getArgument();
+    const char* argument = serialCommands.getArgument();
     if (argument == NULL) {
         // get
         Serial.println(config.deviceSerialNumber);
@@ -44,9 +45,9 @@ void cmdConfigSerialNumber(void) {
     }
 }
 
-void cmdDeviceName(void) {
+void cmdConfigDeviceName(void) {
     DeviceSettings::DeviceConfig config = DeviceSettings::getDeviceConfig();
-    char* argument = serialCommands.getArgument();
+    const char* argument = serialCommands.getArgument();
     if (argument == NULL) {
         // get
         Serial.println(config.deviceName);
@@ -58,23 +59,23 @@ void cmdDeviceName(void) {
     }
 }
 
-void cmdSonosZone(void) {
+void cmdConfigSonosRoom(void) {
     DeviceSettings::SonosConfig config = DeviceSettings::getSonosConfig();
-    char* argument = serialCommands.getArgument();
+    const char* argument = serialCommands.getArgument();
     if (argument == NULL) {
         // get
-        Serial.println(config.sonosZone);
+        Serial.println(config.sonosRoom);
     }
     else {
         // set
-        strncpy(config.sonosZone, argument, sizeof(config.sonosZone));
+        strncpy(config.sonosRoom, argument, sizeof(config.sonosRoom));
         DeviceSettings::setSonosConfig(config);
     }
 }
 
 void cmdConfigWiFiSSID(void) {
     DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
-    char* argument = serialCommands.getArgument();
+    const char* argument = serialCommands.getArgument();
     if (argument == NULL) {
         // get
         Serial.println(config.ssid);
@@ -88,7 +89,7 @@ void cmdConfigWiFiSSID(void) {
 
 void cmdConfigWiFiPassphrase(void) {
     DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
-    char* argument = serialCommands.getArgument();
+    const char* argument = serialCommands.getArgument();
     if (argument == NULL) {
         // get
         Serial.println(config.passphrase);
@@ -102,9 +103,9 @@ void cmdConfigWiFiPassphrase(void) {
 
 void cmdWiFiScan(void) {
     Serial.print(F("Scanning WiFi networks.."));
-    std::vector<WifiManager::WiFiNetwork> networks = pWiFiManager->scanForNetworks();
+    const std::vector<WifiManager::WiFiNetwork> networks = pWiFiManager->scanForNetworks();
     Serial.print(F("..done! (")); Serial.print(networks.size()); Serial.println(F(" networks found)"));
-    for (int i = 0; i < networks.size(); i++) {
+    for (std::size_t i = 0; i < networks.size(); i++) {
         // Print SSID and RSSI for each network found
         Serial.print(i + 1); Serial.print(F(": ")); Serial.print(networks[i].ssid.c_str());
         Serial.print(F(" (")); Serial.print(networks[i].signalStrength); Serial.print(F(")"));
@@ -113,7 +114,7 @@ void cmdWiFiScan(void) {
 }
 
 void cmdWiFiConnect(void) {
-    DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
+    const DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
     Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
     pWiFiManager->startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
 
@@ -141,7 +142,7 @@ void cmdWiFiStartHotspot(void) {
 
 void cmdWiFiStatusClient(void) {
     Serial.print(F("WiFi client mode: "));
-    wl_status_t wifiStatus = WiFi.status();
+    const wl_status_t wifiStatus = WiFi.status();
     switch (wifiStatus) {
         case WL_CONNECTED:
             Serial.print(F("connected to ")); Serial.println(WiFi.SSID());
@@ -163,7 +164,7 @@ void cmdWiFiStatusConfiguration(void) {
 }
 
 void cmdWiFiStatus(void) {
-    WiFiMode_t mode = WiFi.getMode();
+    const WiFiMode_t mode = WiFi.getMode();
     switch(mode) {
         case WIFI_AP:
             cmdWiFiStatusConfiguration();
@@ -178,8 +179,8 @@ void cmdWiFiStatus(void) {
 }
 
 void cmdSonosDiscover(void) {
+    const char* argument = serialCommands.getArgument();
     uint16_t timeoutMs = 5000;
-    char* argument = serialCommands.getArgument();
     if (argument != NULL) {
         timeoutMs = atoi(argument);
     }
@@ -188,13 +189,21 @@ void cmdSonosDiscover(void) {
     std::vector<SonosDevice> sonosDevices = SonosDiscovery::discover(timeoutMs);
     Serial.print(F("..done! (")); Serial.print(sonosDevices.size()); Serial.println(F(" devices found)"));
 
-    for (int i = 0; i < sonosDevices.size(); i++) {
-        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(sonosDevices[i].getRoomName().c_str());
-        Serial.print(F(" (")); Serial.print(sonosDevices[i].getIp());
-        if (sonosDevices[i].isJoined()) {
+    for (std::size_t i = 0; i < sonosDevices.size(); i++) {
+        IPAddress ip = sonosDevices[i].getIp();
+        // cache the device description and zone info to reduce network traffic
+        const std::string xmlDeviceDescription = SonosCommandBuilder::getDeviceDescription(ip);
+        const SonosZoneInfo zoneInfo = sonosDevices[i].getZoneGroupState();
+        const std::string roomName = sonosDevices[i].getRoomName(xmlDeviceDescription);
+        const bool isJoined = sonosDevices[i].isJoined(zoneInfo);
+        const bool isCoordinator = sonosDevices[i].isCoordinator(xmlDeviceDescription, zoneInfo);
+
+        Serial.print(i + 1); Serial.print(F(": ")); Serial.print(roomName.c_str());
+        Serial.print(F(" (")); Serial.print(ip);
+        if (isJoined) {
             Serial.print(F(", joined"));
         }
-        if (sonosDevices[i].isCoordinator()) {
+        if (isCoordinator) {
             Serial.print(F(", coordinator"));
         }
         Serial.println(F(")"));
@@ -202,7 +211,7 @@ void cmdSonosDiscover(void) {
 }
 
 void cmdSonosConnect(void) {
-    char* argument = serialCommands.getArgument();
+    const char* argument = serialCommands.getArgument();
     if (argument != NULL) {
         IPAddress ip;
         if (ip.fromString(argument)) {
@@ -214,7 +223,7 @@ void cmdSonosConnect(void) {
 }
 
 void cmdSonosPlayState(void) {
-    char* argument = serialCommands.getArgument();
+    const char* argument = serialCommands.getArgument();
     if (argument == NULL) {
         // get
         SonosDevice::PlayState::Id playState = pSonosDevice->getPlayState();
@@ -234,6 +243,19 @@ void cmdSonosPlayState(void) {
     }
 }
 
+void cmdSonosVolume(void) {
+    const char* argument = serialCommands.getArgument();
+    if (argument == NULL) {
+        // get
+        Serial.print(F("Sonos volume = ")); Serial.println(pSonosDevice->getVolume());
+    }
+    else {
+        // set
+        int volume = atoi(argument);
+        pSonosDevice->setVolume(volume);
+    }
+}
+
 DebugConsole::DebugConsole(void) {
 }
 
@@ -249,8 +271,8 @@ void DebugConsole::setup(WifiManager& wifiManager, SonosDevice& sonosDevice) {
     serialCommands.addCommand("Config.ClearAll", cmdConfigClearAll);
     serialCommands.addCommand("Config.FactoryDefaults", cmdConfigFactoryDefaults);
     serialCommands.addCommand("Config.SerialNumber", cmdConfigSerialNumber);    
-    serialCommands.addCommand("Config.DeviceName", cmdDeviceName);
-    serialCommands.addCommand("Config.Sonos.Zone", cmdSonosZone);
+    serialCommands.addCommand("Config.DeviceName", cmdConfigDeviceName);
+    serialCommands.addCommand("Config.Sonos.Room", cmdConfigSonosRoom);
     serialCommands.addCommand("Config.WiFi.SSID", cmdConfigWiFiSSID);
     serialCommands.addCommand("Config.WiFi.Passphrase", cmdConfigWiFiPassphrase);
     serialCommands.addCommand("WiFi.Scan", cmdWiFiScan);
@@ -260,6 +282,7 @@ void DebugConsole::setup(WifiManager& wifiManager, SonosDevice& sonosDevice) {
     serialCommands.addCommand("Sonos.Discover", cmdSonosDiscover);
     serialCommands.addCommand("Sonos.Connect", cmdSonosConnect);
     serialCommands.addCommand("Sonos.PlayState", cmdSonosPlayState);
+    serialCommands.addCommand("Sonos.Volume", cmdSonosVolume);
 }
 
 void DebugConsole::loop(void) {

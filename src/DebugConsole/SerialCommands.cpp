@@ -72,7 +72,7 @@ void SerialCommands::addCommand(const char *cmd, void (*function)(void)) {
     }
 }
 
-void SerialCommands::listCommands(void) {
+void SerialCommands::listCommands(void) const {
     Serial.println();
     for(int i = 0; i < m_numberOfCommands; i++) {
         Serial.println(m_commands[i].command);

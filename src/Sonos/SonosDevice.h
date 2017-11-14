@@ -19,7 +19,8 @@ public:
     /**
      * List of possible play states.
      */
-    struct PlayState {
+    class PlayState {
+    public:
         enum Id {
             // Player has an error
             ERROR = 0,
@@ -33,19 +34,16 @@ public:
             TRANSITIONING = 4
         };
 
-        static PlayState::Id valueOf(const std::string& s) {
-            return s_valueMap.at(s);
-        }
+        static PlayState::Id valueOf(const std::string& s);
+        static std::string toString(const PlayState::Id value);
 
-        static std::string toString(const PlayState::Id value) {
-            for (auto it = s_valueMap.begin(); it != s_valueMap.end(); ++it) {
-                if (it->second == value) {
-                    return it->first;
-                }
-            }
-            return "";
-        }
-
+    private:
+        /**
+        * Private copy constructor.
+        */
+        PlayState(void);
+        
+        // static fields
         static std::unordered_map<std::string, PlayState::Id> s_valueMap;
     };
 
@@ -67,13 +65,13 @@ public:
     /**
      * Get the IP address of the sonos device.
      */
-    IPAddress getIp(void);
+    IPAddress getIp(void) const;
 
     /**
      * Get the play state of the device.
      * @return current PlayState of the device
      */
-    PlayState::Id getPlayState(void);
+    PlayState::Id getPlayState(void) const;
 
     /**
      * Play a given stream. Pauses the queue.
@@ -106,19 +104,19 @@ public:
      * Get the Sonos speaker volume.
      * @return A volume value between 0 and 100
      */
-    int getVolume(void);
+    uint8_t getVolume(void) const;
 
     /**
      * Set the Sonos speaker volume.
      * @param volume A volume value between 0 and 100
      */
-    void setVolume(int volume);
+    void setVolume(uint8_t volume);
 
     /**
      * Return the mute state of the Sonos speaker.
      * @return True if is muted, false if isn't
      */
-    bool isMuted(void);
+    bool isMuted(void) const;
 
     /**
      * Mute or unmute the Sonos speaker.
@@ -127,28 +125,51 @@ public:
     void setMute(bool state);
 
     /**
+     * Return the information about the Sonos zone.
+     */
+    SonosZoneInfo getZoneGroupState(void) const;
+
+    /**
      * Get the room name of the Sonos speaker.
      */
-    std::string getRoomName(void);
+    std::string getRoomName(void) const;
+
+    /**
+     * Get the room name of the Sonos speaker.
+     * @param xmlDeviceDescription as XML string (from SonosCommandBuilder::getDeviceDescription() to reduce network traffic)
+     */
+    static std::string getRoomName(const std::string& xmlDeviceDescription);
 
     /**
      * Return if the Sonos is joined with another one.
      * Note: If a speaker is joined with other speakers in the zone, only the group coordinator can perform actions
      * @return True if is joined, false if is isn't
      */
-    bool isJoined(void);
+    bool isJoined(void) const;
 
     /**
-     * 
+     * Return if the Sonos is joined with another one.
+     * Note: If a speaker is joined with other speakers in the zone, only the group coordinator can perform actions
+     * @param sonosZoneInfo (from getZoneGroupState() to reduce network traffic)
+     * @return True if is joined, false if is isn't
      */
-    SonosZoneInfo getZoneGroupState(void);
+    static bool isJoined(const SonosZoneInfo& sonosZoneInfo);
 
     /**
      * Check if the speaker is a group coordinator or not.
      * Note: If a speaker is joined with other speakers in the zone, only the group coordinator can perform actions
      * @return True if the speaker is a group coordinator, otherwise False.
      */
-    bool isCoordinator(void);
+    bool isCoordinator(void) const;
+
+    /**
+     * Check if the speaker is a group coordinator or not.
+     * Note: If a speaker is joined with other speakers in the zone, only the group coordinator can perform actions
+     * @param xmlDeviceDescription as XML string (from SonosCommandBuilder::getDeviceDescription() to reduce network traffic)
+     * @param sonosZoneInfo (from getZoneGroupState() to reduce network traffic)
+     * @return True if the speaker is a group coordinator, otherwise False.
+     */
+    static bool isCoordinator(const std::string& xmlDeviceDescription, const SonosZoneInfo& sonosZoneInfo);
 
 private:
 

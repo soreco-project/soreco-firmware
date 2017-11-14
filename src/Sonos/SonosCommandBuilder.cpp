@@ -66,7 +66,7 @@ SonosCommandBuilder& SonosCommandBuilder::put(const std::string& key, std::strin
 std::string SonosCommandBuilder::executeOn(const IPAddress& ip) {
     HTTPClient httpClient;
     if (httpClient.begin(ip.toString(), SOAP_PORT, m_endpoint.c_str())) {
-        // Note: this is highly inefficient, but for strange reasons the std::stringstream can't be used here due to linker errors once including <sstream>
+        // note: we cannot use std::stringstream in Arduino since it will create linker errors
         std::string content = "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:";
         content += m_action;
         content += " xmlns:u=\"";

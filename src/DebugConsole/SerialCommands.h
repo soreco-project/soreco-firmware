@@ -30,9 +30,20 @@ public:
     */
     void loop(void);
     
-    void addCommand(const char*, void(*)());
+    /**
+     * Register a function callback to the given command 
+     */
+    void addCommand(const char* cmd, void(*function)());
+    
+    /**
+     * Get the next argument of a command
+     */
     char* getArgument(void);
-    void listCommands(void);
+
+    /**
+     * List all available commands on the Serial console.
+     */
+    void listCommands(void) const;
     
 private:
 
@@ -62,7 +73,7 @@ private:
     // buffer for characters until terminator received
     char m_buffer[MAX_COMMAND_LENGTH];
     char* m_argumentSavePtr;
-    uint8_t m_bufferPos;                        
+    uint8_t m_bufferPos;
     uint8_t m_numberOfCommands;
     SerialCommandsCallback m_commands[MAX_COMMANDS];   
 };

@@ -11,15 +11,31 @@ class SonosZoneInfo {
 
 public:
 
+    /**
+     * Constructor
+     */
     SonosZoneInfo(const std::string& name, const std::string& id, const std::vector<std::string>& zonePlayerUIDInGroup);
 
-    std::string getName(void);
+    /**
+     * Get the name of the Zone
+     */
+    std::string getName(void) const;
 
-    std::string getId(void);
+    /**
+     * Get the identifier of the Zone (as UID)
+     */
+    std::string getId(void) const;
 
-    std::vector<std::string> getZonePlayerUIDInGroup(void);
+    /**
+     * Get the list of UID players grouped in this zone.
+     */
+    std::vector<std::string> getZonePlayerUIDInGroup(void) const;
 
-    std::vector<SonosDevice> getSonosDevicesInGroup(void);
+    /**
+     * Get the list of devices grouped in this zone.
+     * Note: this will discover each device and generates network traffic
+     */
+    std::vector<SonosDevice> getSonosDevicesInGroup(void) const;
 
 private:
 
