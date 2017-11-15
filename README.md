@@ -5,7 +5,8 @@ Firmware for soreco Sonos Remote Control.
 soreco is an open source hardware platform to build a remote controller for Sonos wireless home sound system.
 The system is currently under development.
 
-[![Build Status](https://travis-ci.org/soreco-project/soreco-firmware.svg?branch=develop)](https://travis-ci.org/soreco-project/soreco-firmware)
+[![Build Status](https://travis-ci.org/soreco-project/soreco-firmware.svg?branch=develop)](https://travis-ci.org/soreco-project/soreco-firmware) 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/65e64e47425b49ffbc05d3c85264677e)](https://www.codacy.com/app/mguntli/soreco-firmware?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=soreco-project/soreco-firmware&amp;utm_campaign=Badge_Grade)
 
 ## Usage
 Open soreco-firmware.ino in Arduino and flash the NodeMCU 1.0 (ESP-12E Module).
