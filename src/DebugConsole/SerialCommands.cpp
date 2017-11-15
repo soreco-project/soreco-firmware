@@ -2,13 +2,15 @@
 
 #include <Arduino.h>
 #include <string.h>
+#include <cstddef>
 
 SerialCommands::SerialCommands(void) :
     m_argumentSavePtr(NULL),
     m_bufferPos(0),
-    m_numberOfCommands(0)
+    m_numberOfCommands(0),
+    m_commands()
 {
-    clearBuffer(); 
+    clearBuffer();
 }
 
 SerialCommands::~SerialCommands(void) {
@@ -19,7 +21,7 @@ void SerialCommands::setup(void) {
 
 void SerialCommands::loop(void) {
     while (Serial.available() > 0) {
-        char ch = Serial.read();    
+        char ch = Serial.read();
         if (ch == COMMAND_TERMINATOR) {
             char* token = strtok_r(m_buffer, COMMAND_DELIMITER, &m_argumentSavePtr);
             bool commandFound = false;
@@ -28,9 +30,9 @@ void SerialCommands::loop(void) {
                     // Compare the found command against the list of known commands for a match
                     if(strcasecmp(token, m_commands[i].command) == 0) {
                         // Execute the stored handler function for the command
-                        (*m_commands[i].function)(); 
+                        (*m_commands[i].function)();
                         commandFound = true;
-                        break; 
+                        break;
                     }
                 }
             }
@@ -50,7 +52,7 @@ void SerialCommands::loop(void) {
 }
 
 void SerialCommands::clearBuffer(void) {
-    for (int i = 0; i < sizeof(m_buffer); i++)  {
+    for (std::size_t i = 0; i < sizeof(m_buffer); i++)  {
         m_buffer[i] = '\0';
     }
     m_bufferPos = 0;
@@ -63,12 +65,12 @@ char* SerialCommands::getArgument(void)  {
 
 void SerialCommands::addCommand(const char *cmd, void (*function)(void)) {
     if (m_numberOfCommands < MAX_COMMANDS) {
-        strncpy(m_commands[m_numberOfCommands].command, cmd, MAX_COMMAND_LENGTH); 
-        m_commands[m_numberOfCommands].function = function; 
+        strncpy(m_commands[m_numberOfCommands].command, cmd, MAX_COMMAND_LENGTH);
+        m_commands[m_numberOfCommands].function = function;
         m_numberOfCommands++;
     }
     else {
-        Serial.println(F("ERROR: SerialCommands - reached commands limit")); 
+        Serial.println(F("ERROR: SerialCommands - reached commands limit"));
     }
 }
 

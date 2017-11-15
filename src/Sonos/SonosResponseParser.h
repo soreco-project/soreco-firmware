@@ -15,7 +15,7 @@ public:
      * Find the value between the given startTag and endTag in the given response.
      */
     static std::string findOne(const std::string& startTag, const std::string& endTag, const std::string& response);
-    
+
     /**
      * Splits a string into substrings that are that are delimited by the given character.
      */
@@ -27,7 +27,7 @@ private:
      * Private default constructor.
      */
     SonosResponseParser(void);
-    
+
     /**
      * Private copy constructor.
      */

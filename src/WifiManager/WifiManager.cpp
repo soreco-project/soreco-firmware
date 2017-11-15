@@ -45,7 +45,7 @@ void WifiManager::startConfigMode(const uint32_t deviceSerialNumber) {
     char ssid[32+1];
     memcpy(ssid, CONFIG_SSID_PREFIX, strlen(CONFIG_SSID_PREFIX));
     itoa(deviceSerialNumber, &ssid[strlen(CONFIG_SSID_PREFIX)], 10);
-    
+
     // start config hotspot with device serial number as ssid (no password)
     WiFi.softAPConfig(localIp, gateway, subnet);
     bool success = WiFi.softAP(ssid);
@@ -66,7 +66,7 @@ void WifiManager::startClientMode(const char* ssid, const char* passphrase) {
     WiFi.disconnect();
     // TODO: analyze why is the delay required..
     delay(100);
-    
+
     // Explicitly set the ESP8266 to be a WiFi-client, otherwise it would try to act as both a client and an access-point
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, passphrase);

@@ -35,7 +35,7 @@ public:
      * Setup the current WiFi manager
      */
     void setup(void);
-    
+
     /**
      * handle TCP. TODO do it with irq!
      */
@@ -58,7 +58,7 @@ public:
     std::vector<WiFiNetwork> scanForNetworks(void);
 
     /**
-     * Returns true if wifi module is connected to an access point 
+     * Returns true if wifi module is connected to an access point
      */
     bool isWifiConnected(void) const;
 

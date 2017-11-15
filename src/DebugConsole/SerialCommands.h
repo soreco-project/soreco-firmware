@@ -9,7 +9,7 @@
  */
 class SerialCommands {
 public:
-    
+
     /**
     * Default constructor.
     */
@@ -24,17 +24,17 @@ public:
     * One time configuration.
     */
     void setup(void);
-    
+
     /**
     * Process console input.
     */
     void loop(void);
-    
+
     /**
-     * Register a function callback to the given command 
+     * Register a function callback to the given command
      */
     void addCommand(const char* cmd, void(*function)());
-    
+
     /**
      * Get the next argument of a command
      */
@@ -44,7 +44,7 @@ public:
      * List all available commands on the Serial console.
      */
     void listCommands(void) const;
-    
+
 private:
 
     /**
@@ -58,13 +58,13 @@ private:
     SerialCommands& operator=(const SerialCommands&);
 
     void clearBuffer(void);
-    
+
     static const uint8_t MAX_COMMAND_LENGTH = 48;
     static const uint8_t MAX_COMMANDS = 32;
     const char* COMMAND_DELIMITER = " ";
     const char COMMAND_TERMINATOR = '\n';
 
-    // Data structure to hold Command/Handler function key-value pairs                      
+    // Data structure to hold Command/Handler function key-value pairs
     struct SerialCommandsCallback {
         char command[MAX_COMMAND_LENGTH];
         void (*function)(void);
@@ -75,7 +75,7 @@ private:
     char* m_argumentSavePtr;
     uint8_t m_bufferPos;
     uint8_t m_numberOfCommands;
-    SerialCommandsCallback m_commands[MAX_COMMANDS];   
+    SerialCommandsCallback m_commands[MAX_COMMANDS];
 };
 
 #endif //SERIALCOMMANDS_H

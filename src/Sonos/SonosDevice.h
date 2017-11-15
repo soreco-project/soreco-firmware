@@ -42,7 +42,7 @@ public:
         * Private copy constructor.
         */
         PlayState(void);
-        
+
         // static fields
         static std::unordered_map<std::string, PlayState::Id> s_valueMap;
     };
@@ -55,7 +55,7 @@ public:
     /**
      * Constructor with IP address.
      */
-    SonosDevice(const IPAddress& ip);
+    explicit SonosDevice(const IPAddress& ip);
 
     /**
      * Update destination to the given IP address.
