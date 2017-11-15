@@ -42,6 +42,8 @@ void DeviceStateMachine::runStateMachine(void) {
                 // TODO if wifi connected go to STM_Sonos_Zone_Connecting
                 conditionalStep(m_deviceHandler.isWifiConnected(), State::Idle);
                 break;
+            case State::Sonos_Connecting:
+                break;
             case State::Idle:
                 // TODO
                 break;
@@ -72,17 +74,19 @@ void DeviceStateMachine::onEnterState(const State::Id state) {
     switch (state) {
         case State::Init:
             break;
-        case State::Wifi_Connecting: {
-                const DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
-                m_deviceHandler.startWifi(config);
-            }
-            break;
         case State::Hotspot_Starting: {
                 const DeviceSettings::DeviceParameters parameters = DeviceSettings::getDeviceParameters();
                 m_deviceHandler.startHotspot(parameters);
             }
             break;
         case State::Hotspot_Idle:
+            break;
+        case State::Wifi_Connecting: {
+            const DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
+            m_deviceHandler.startWifi(config);
+            }
+            break;
+        case State::Sonos_Connecting:
             break;
         case State::Idle:
             break;
@@ -95,11 +99,13 @@ void DeviceStateMachine::onRunState(const State::Id state) {
     switch (state) {
         case State::Init:
             break;
-        case State::Wifi_Connecting:
-            break;
         case State::Hotspot_Starting:
             break;
         case State::Hotspot_Idle:
+            break;
+        case State::Wifi_Connecting:
+            break;
+        case State::Sonos_Connecting:
             break;
         case State::Idle:
             // TODO move as a const into SystemInitilizeDrivere
@@ -114,11 +120,13 @@ void DeviceStateMachine::onLeaveState(const State::Id state) {
     switch (state) {
         case State::Init:
             break;
-        case State::Wifi_Connecting:
-            break;
         case State::Hotspot_Starting:
             break;
         case State::Hotspot_Idle:
+            break;
+        case State::Wifi_Connecting:
+            break;
+        case State::Sonos_Connecting:
             break;
         case State::Idle:
             break;
