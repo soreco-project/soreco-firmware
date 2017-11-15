@@ -42,6 +42,7 @@ private:
             Hotspot_Idle,
             Wifi_Connecting,
             Sonos_Connecting,
+            Sonos_Retry,
             Idle
         };
     };

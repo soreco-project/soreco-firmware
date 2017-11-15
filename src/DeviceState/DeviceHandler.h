@@ -26,6 +26,10 @@ public:
     bool isWifiConnected(void) const;
     void startHotspot(const DeviceSettings::DeviceParameters& deviceConfig);
 
+    // Sonos events
+    void connectToSonos(const DeviceSettings::SonosConfig& sonosConfig);
+    bool isSonosConnected(void) const;
+
     // input event handlers
     void onEventVolumeUp(uint16_t volumeStepCount);
     void onEventVolumeDown(uint16_t volumeStepCount);
@@ -50,8 +54,11 @@ private:
     */
     DeviceHandler& operator=(const DeviceHandler&);
 
+    void setSonosCoordinator(SonosDevice& sonosCoordinator);
+
     WifiManager& m_wiFiManager;
-    SonosDevice& m_sonosDevice;
+    SonosDevice& m_sonosCoordinator;
+    bool m_sonosConnected;
 };
 
 #endif //DEVICEHANDLER_H

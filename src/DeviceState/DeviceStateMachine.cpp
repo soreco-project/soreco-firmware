@@ -39,10 +39,14 @@ void DeviceStateMachine::runStateMachine(void) {
                 // TODO
                 break;
             case State::Wifi_Connecting:
-                // TODO if wifi connected go to STM_Sonos_Zone_Connecting
-                conditionalStep(m_deviceHandler.isWifiConnected(), State::Idle);
+                conditionalStep(m_deviceHandler.isWifiConnected(), State::Sonos_Connecting);
                 break;
             case State::Sonos_Connecting:
+                conditionalStep(m_deviceHandler.isSonosConnected(), State::Idle);
+                conditionalStep(!m_deviceHandler.isSonosConnected(), State::Sonos_Retry);
+                break;
+            case State::Sonos_Retry:
+                m_nextState = State::Sonos_Connecting;
                 break;
             case State::Idle:
                 // TODO
@@ -86,7 +90,12 @@ void DeviceStateMachine::onEnterState(const State::Id state) {
             m_deviceHandler.startWifi(config);
             }
             break;
-        case State::Sonos_Connecting:
+        case State::Sonos_Connecting: {
+            const DeviceSettings::SonosConfig config = DeviceSettings::getSonosConfig();
+            m_deviceHandler.connectToSonos(config);
+            }
+            break;
+        case State::Sonos_Retry:
             break;
         case State::Idle:
             break;
@@ -107,8 +116,10 @@ void DeviceStateMachine::onRunState(const State::Id state) {
             break;
         case State::Sonos_Connecting:
             break;
+        case State::Sonos_Retry:
+            break;
         case State::Idle:
-            // TODO move as a const into SystemInitilizeDrivere
+            // TODO move as a const into SystemInitilizeDriver
             digitalWrite(2, LOW);
             break;
         default:
@@ -127,6 +138,8 @@ void DeviceStateMachine::onLeaveState(const State::Id state) {
         case State::Wifi_Connecting:
             break;
         case State::Sonos_Connecting:
+            break;
+        case State::Sonos_Retry:
             break;
         case State::Idle:
             break;
