@@ -6,8 +6,8 @@
 #include "../Sonos/SonosDevice.h"
 
 DeviceStateMachine::DeviceStateMachine(WifiManager& wifiManager, SonosDevice& sonosDevice) :
-    m_currentState(StateMachineState_Init),
-    m_nextState(StateMachineState_Init),
+    m_currentState(State::Init),
+    m_nextState(State::Init),
     m_deviceHandler(wifiManager, sonosDevice) {
 }
 
@@ -15,8 +15,8 @@ DeviceStateMachine::~DeviceStateMachine(void) {
 }
 
 void DeviceStateMachine::resetStateMachine(void) {
-    m_currentState = StateMachineState_Init;
-    m_nextState = StateMachineState_Init;
+    m_currentState = State::Init;
+    m_nextState = State::Init;
 }
 
 void DeviceStateMachine::runStateMachine(void) {
@@ -27,22 +27,22 @@ void DeviceStateMachine::runStateMachine(void) {
         stateChanged = false;
 
         switch (m_currentState) {
-            case StateMachineState_Init:
+            case State::Init:
                 // only enter config mode when there is no stored network in DeviceSettings
-                m_nextState = DeviceSettings::getWiFiConfig().isConfigured() ? StateMachineState_Wifi_Connecting : StateMachineState_Hotspot_Starting;
+                m_nextState = DeviceSettings::getWiFiConfig().isConfigured() ? State::Wifi_Connecting : State::Hotspot_Starting;
                 break;
-            case StateMachineState_Hotspot_Starting:
+            case State::Hotspot_Starting:
                 // TODO check is hotspot started
-                conditionalStep(true, StateMachineState_Hotspot_Idle);
+                conditionalStep(true, State::Hotspot_Idle);
                 break;
-            case StateMachineState_Hotspot_Idle:
+            case State::Hotspot_Idle:
                 // TODO
                 break;
-            case StateMachineState_Wifi_Connecting:
+            case State::Wifi_Connecting:
                 // TODO if wifi connected go to STM_Sonos_Zone_Connecting
-                conditionalStep(m_deviceHandler.isWifiConnected(), StateMachineState_Idle);
+                conditionalStep(m_deviceHandler.isWifiConnected(), State::Idle);
                 break;
-            case StateMachineState_Idle:
+            case State::Idle:
                 // TODO
                 break;
             default:
@@ -68,40 +68,40 @@ void DeviceStateMachine::runStateMachine(void) {
     } while (stateChanged);
 }
 
-void DeviceStateMachine::onEnterState(const StateMachineState state) {
+void DeviceStateMachine::onEnterState(const State::Id state) {
     switch (state) {
-        case StateMachineState_Init:
+        case State::Init:
             break;
-        case StateMachineState_Wifi_Connecting: {
+        case State::Wifi_Connecting: {
                 const DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
                 m_deviceHandler.startWifi(config);
             }
             break;
-        case StateMachineState_Hotspot_Starting: {
+        case State::Hotspot_Starting: {
                 const DeviceSettings::DeviceParameters parameters = DeviceSettings::getDeviceParameters();
                 m_deviceHandler.startHotspot(parameters);
             }
             break;
-        case StateMachineState_Hotspot_Idle:
+        case State::Hotspot_Idle:
             break;
-        case StateMachineState_Idle:
+        case State::Idle:
             break;
         default:
             break;
     }
 }
 
-void DeviceStateMachine::onRunState(const StateMachineState state) {
+void DeviceStateMachine::onRunState(const State::Id state) {
     switch (state) {
-        case StateMachineState_Init:
+        case State::Init:
             break;
-        case StateMachineState_Wifi_Connecting:
+        case State::Wifi_Connecting:
             break;
-        case StateMachineState_Hotspot_Starting:
+        case State::Hotspot_Starting:
             break;
-        case StateMachineState_Hotspot_Idle:
+        case State::Hotspot_Idle:
             break;
-        case StateMachineState_Idle:
+        case State::Idle:
             // TODO move as a const into SystemInitilizeDrivere
             digitalWrite(2, LOW);
             break;
@@ -110,24 +110,24 @@ void DeviceStateMachine::onRunState(const StateMachineState state) {
     }
 }
 
-void DeviceStateMachine::onLeaveState(const StateMachineState state) {
+void DeviceStateMachine::onLeaveState(const State::Id state) {
     switch (state) {
-        case StateMachineState_Init:
+        case State::Init:
             break;
-        case StateMachineState_Wifi_Connecting:
+        case State::Wifi_Connecting:
             break;
-        case StateMachineState_Hotspot_Starting:
+        case State::Hotspot_Starting:
             break;
-        case StateMachineState_Hotspot_Idle:
+        case State::Hotspot_Idle:
             break;
-        case StateMachineState_Idle:
+        case State::Idle:
             break;
         default:
             break;
     }
 }
 
-void DeviceStateMachine::conditionalStep(const bool isValid, const StateMachineState state) {
+void DeviceStateMachine::conditionalStep(const bool isValid, const State::Id state) {
     if (isValid) {
         m_nextState = state;
     }

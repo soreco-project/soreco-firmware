@@ -11,17 +11,6 @@ class DeviceStateMachine {
 public:
 
     /**
-     * States provided by this state machine
-     */
-    enum StateMachineState {
-        StateMachineState_Init,
-        StateMachineState_Hotspot_Starting,
-        StateMachineState_Hotspot_Idle,
-        StateMachineState_Wifi_Connecting,
-        StateMachineState_Idle,
-    };
-
-    /**
     * Default constructor.
     */
     DeviceStateMachine(WifiManager& wifiManager, SonosDevice& sonosDevice);
@@ -40,7 +29,21 @@ public:
      * Rests the state machine.
      */
     void resetStateMachine(void);
+
 private:
+
+    /**
+     * States provided by this state machine
+     */
+    struct State {
+        enum Id {
+            Init,
+            Hotspot_Starting,
+            Hotspot_Idle,
+            Wifi_Connecting,
+            Idle
+        };
+    };
 
     /**
     * Private copy constructor.
@@ -52,17 +55,17 @@ private:
     */
     DeviceStateMachine& operator=(const DeviceStateMachine&);
 
-    void onEnterState(const StateMachineState state);
-    void onRunState(const StateMachineState state);
-    void onLeaveState(const StateMachineState state);
+    void onEnterState(const State::Id state);
+    void onRunState(const State::Id state);
+    void onLeaveState(const State::Id state);
 
     /**
      * Switch to the given state if conditional valid
      */
-    void conditionalStep(const bool isValid, const StateMachineState state);
+    void conditionalStep(const bool isValid, const State::Id state);
 
-    StateMachineState m_currentState;
-    StateMachineState m_nextState;
+    State::Id m_currentState;
+    State::Id m_nextState;
     DeviceHandler m_deviceHandler;
 };
 
