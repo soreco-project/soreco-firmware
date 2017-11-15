@@ -16,7 +16,7 @@ public:
      * @param const std::string& s
      */
     static bool isXml11Escaped(const std::string& s);
-    
+
     /**
      * Escape special characters in the given string (XML 1.1).
      * @param std::string& s
@@ -29,7 +29,7 @@ private:
      * Private default constructor.
      */
     XmlStringEscapeUtils(void);
-    
+
     /**
      * Private copy constructor.
      */

@@ -15,12 +15,12 @@ const char* SonosCommandBuilder::CONTENT_DIRECTORY_SERVICE      = "urn:schemas-u
 const char* SonosCommandBuilder::ZONE_GROUP_TOPOLOGY_ENDPOINT   = "/ZoneGroupTopology/Control";
 const char* SonosCommandBuilder::ZONE_GROUP_TOPOLOGY_SERVICE    = "urn:upnp-org:serviceId:ZoneGroupTopology";
 
-SonosCommandBuilder::SonosCommandBuilder(const std::string& endpoint, const std::string& service, const std::string& action) {
-    m_endpoint = endpoint;
-    m_service = service;
-    m_action = action;
+SonosCommandBuilder::SonosCommandBuilder(const std::string& endpoint, const std::string& service, const std::string& action) :
+    m_endpoint(endpoint),
+    m_service(service),
+    m_action(action)
+{
 }
-
 
 std::string SonosCommandBuilder::getDeviceDescription(const IPAddress& ip) {
     HTTPClient httpClient;

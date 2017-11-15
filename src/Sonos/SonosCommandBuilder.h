@@ -46,7 +46,7 @@ private:
      * Private default constructor.
      */
     SonosCommandBuilder(void);
-    
+
     /**
      * Private copy constructor.
      */

@@ -15,11 +15,11 @@ public:
     * Default constructor.
     */
     DeviceHandler(WifiManager& wifiManager, SonosDevice& sonosDevice);
-	
-	/**
-	* Destructor.
-	*/
-	~DeviceHandler(void);
+
+    /**
+    * Destructor.
+    */
+    ~DeviceHandler(void);
 
     // Wifi events
     void startWifi(const DeviceSettings::WiFiConfig& wifiConfig);
@@ -37,20 +37,20 @@ public:
     void onEventPreset3(void);
     void onEventPreset4(void);
     void onEventConfigMode(void);
-	void onEventRestart(void);
-	
+    void onEventRestart(void);
+
 private:
     /**
     * Private copy constructor.
     */
     DeviceHandler(const DeviceHandler&);
-	
-	/**
-	* Private assignment constructor.
-	*/
-	DeviceHandler& operator=(const DeviceHandler&);
 
-	WifiManager& m_wiFiManager;
+    /**
+    * Private assignment constructor.
+    */
+    DeviceHandler& operator=(const DeviceHandler&);
+
+    WifiManager& m_wiFiManager;
     SonosDevice& m_sonosDevice;
 };
 

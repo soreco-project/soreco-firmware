@@ -270,7 +270,7 @@ void DebugConsole::setup(WifiManager& wifiManager, SonosDevice& sonosDevice) {
     serialCommands.addCommand("Config.Save", cmdConfigSave);
     serialCommands.addCommand("Config.ClearAll", cmdConfigClearAll);
     serialCommands.addCommand("Config.FactoryDefaults", cmdConfigFactoryDefaults);
-    serialCommands.addCommand("Config.SerialNumber", cmdConfigSerialNumber);    
+    serialCommands.addCommand("Config.SerialNumber", cmdConfigSerialNumber);
     serialCommands.addCommand("Config.DeviceName", cmdConfigDeviceName);
     serialCommands.addCommand("Config.Sonos.Room", cmdConfigSonosRoom);
     serialCommands.addCommand("Config.WiFi.SSID", cmdConfigWiFiSSID);

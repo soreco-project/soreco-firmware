@@ -41,7 +41,7 @@ private:
      * Private default constructor.
      */
     SonosDiscovery(void);
-    
+
     /**
      * Private copy constructor.
      */

@@ -46,7 +46,7 @@ private:
     * Private copy constructor.
     */
     DeviceStateMachine(const DeviceStateMachine&);
-   
+
     /**
     * Private assignment constructor.
     */
@@ -63,7 +63,6 @@ private:
 
     StateMachineState m_currentState;
     StateMachineState m_nextState;
-
     DeviceHandler m_deviceHandler;
 };
 
