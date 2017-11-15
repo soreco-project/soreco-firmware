@@ -30,7 +30,7 @@ script:
   # Arduino compilation
   - arduino --verify --board $BD $PWD/soreco-firmware.ino
   # cppcheck static code analysis
-  - cppcheck --quiet --error-exitcode=1
+  - cppcheck src --quiet --error-exitcode=1
 
 notifications:
   email:
