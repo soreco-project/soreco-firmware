@@ -3,19 +3,11 @@
 std::vector<SonosDevice> SonosDiscovery::discover(const uint16_t timeoutMs) {
     std::vector<SonosDevice> deviceList;
     WiFiUDP udpClient;
-    udpClient.begin(SSDP_PORT);
-
-    udpClient.beginPacketMulticast(IPAddress(239, 255, 255, 250), SSDP_PORT, WiFi.localIP());
-    udpClient.write("M-SEARCH * HTTP/1.1\r\n"
-              "HOST: 239.255.255.250:1900\r\n"
-              "MAN: \"ssdp:discover\"\r\n"
-              "MX: 1\r\n"
-              "ST: urn:schemas-upnp-org:device:ZonePlayer:1\r\n");
-    udpClient.endPacket();
-
+    broadcastSearch(udpClient, "urn:schemas-upnp-org:device:ZonePlayer:1\r\n");
+    
     // now wait the maximum defined time for all devices to respond
     unsigned long startTimeMs = millis();
-    while((millis() - startTimeMs) < timeoutMs) {
+    while ((millis() - startTimeMs) < timeoutMs) {
         processResponse(udpClient, deviceList);
         delay(50);
     }
@@ -25,35 +17,74 @@ std::vector<SonosDevice> SonosDiscovery::discover(const uint16_t timeoutMs) {
 SonosDevice SonosDiscovery::discoverByUID(const uint16_t timeoutMs, const std::string& uid) {
     std::vector<SonosDevice> deviceList;
     WiFiUDP udpClient;
-    udpClient.begin(SSDP_PORT);
+    broadcastSearch(udpClient, "uuid:" + uid);
+    
+    // now wait the maximum defined time for the device to respond
+    unsigned long startTimeMs = millis();
+    while ((millis() - startTimeMs) < timeoutMs) {
+        if (processResponse(udpClient, deviceList) && (deviceList.size() >= 1)) {
+            // the device responded, immediatly return
+            return deviceList[0];
+        }
+        delay(50);
+    }
+    // TODO: better error handling when no device found
+    return SonosDevice();
+}
 
+SonosDevice SonosDiscovery::discoverCoordinator(const uint16_t timeoutMs, const std::string& roomName) {
+    std::vector<SonosDevice> deviceList;
+    WiFiUDP udpClient;
+    broadcastSearch(udpClient, "urn:schemas-upnp-org:device:ZonePlayer:1\r\n");
+
+    // wait the maximum defined time for all devices to respond, immediatly return once we have a matching coordinator
+    // now wait the maximum defined time for the device to respond
+    unsigned long startTimeMs = millis();
+    while ((millis() - startTimeMs) < timeoutMs) {
+        if (processResponse(udpClient, deviceList)) {
+            // new device found
+            SonosDevice foundDevice = deviceList[deviceList.size() - 1];
+            if (foundDevice.getRoomName() == roomName) {
+                if (foundDevice.isCoordinator()) {
+                    return foundDevice;
+                }
+                else if (foundDevice.isJoined()) {
+                    SonosZoneInfo zoneInfo = foundDevice.getZoneGroupState();
+                    std::vector<SonosDevice> zoneDevices = zoneInfo.getSonosDevicesInGroup();
+                    for (SonosDevice zoneDevice : zoneDevices) {
+                        if (zoneDevice.isCoordinator(zoneInfo)) {
+                            return zoneDevice;
+                        }
+                    }
+                }
+            }
+            else {
+                // remove from list, wait for the next device
+                deviceList.pop_back();
+            }
+        }
+    }
+    // TODO: better error handling when no device found
+    return SonosDevice();
+}
+
+void SonosDiscovery::broadcastSearch(WiFiUDP& udpClient, const std::string& serviceType) {
+    udpClient.begin(SSDP_PORT);
     udpClient.beginPacketMulticast(IPAddress(239, 255, 255, 250), SSDP_PORT, WiFi.localIP());
     std::string request = "M-SEARCH * HTTP/1.1\r\n";
     request += "HOST: 239.255.255.250:1900\r\n";
     request += "MAN: \"ssdp:discover\"\r\n";
     request += "MX: 1\r\n";
-    request += "ST: uuid:";
-    request += uid;
+    request += "ST: ";
+    request += serviceType;
     request += "\r\n";
     udpClient.write(request.c_str());
     udpClient.endPacket();
-
-    // now wait the maximum defined time for all devices to respond
-    unsigned long startTimeMs = millis();
-    while((millis() - startTimeMs) < timeoutMs) {
-        processResponse(udpClient, deviceList);
-        if (deviceList.size() >= 1) {
-            return deviceList[0];
-        }
-        delay(50);
-    }
-    // TODO: error handling
-    return SonosDevice();
 }
 
-void SonosDiscovery::processResponse(WiFiUDP& udpClient, std::vector<SonosDevice>& deviceList) {
+bool SonosDiscovery::processResponse(WiFiUDP& udpClient, std::vector<SonosDevice>& deviceList) {
     int packetSize = udpClient.parsePacket();
-    if(packetSize > 0) {
+    if (packetSize > 0) {
         // read the begin of the packet in order to extract the UUID
         char buffer[512];
         int bytesRead = udpClient.read(buffer, sizeof(buffer));
@@ -68,12 +99,12 @@ void SonosDiscovery::processResponse(WiFiUDP& udpClient, std::vector<SonosDevice
                 // it's actually a Sonos device and it's safe to read the uuid
                 uuidStartPos += 5; // advance start pointer by length of "uuid:"
                 std::string uuid = response.substr(uuidStartPos, uuidEndPos - uuidStartPos);
-                SonosDevice sonosDevice(udpClient.remoteIP());
+                SonosDevice sonosDevice(udpClient.remoteIP(), uuid);
 
                 // TODO: for a unknown reason we get sporadically multiple responses from the same device
                 // check if device not already in the list
                 bool deviceAdded = false;
-                for(std::size_t i = 0; i < deviceList.size(); i++) {
+                for (std::size_t i = 0; i < deviceList.size(); i++) {
                     if (deviceList[i].getIp() == udpClient.remoteIP()) {
                         deviceAdded = true;
                         break;
@@ -81,8 +112,10 @@ void SonosDiscovery::processResponse(WiFiUDP& udpClient, std::vector<SonosDevice
                 }
                 if (!deviceAdded) {
                     deviceList.push_back(sonosDevice);
+                    return true;
                 }
             }
         }
     }
+    return false;
 }

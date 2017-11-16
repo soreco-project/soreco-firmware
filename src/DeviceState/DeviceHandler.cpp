@@ -25,41 +25,22 @@ void DeviceHandler::startHotspot(const DeviceSettings::DeviceParameters& deviceC
 }
 
 void DeviceHandler::connectToSonos(const DeviceSettings::SonosConfig& sonosConfig) {
-    std::string configuredRoomName(sonosConfig.sonosRoom);
-    if (configuredRoomName.empty()) {
+    std::string roomName(sonosConfig.sonosRoom);
+    if (roomName.empty()) {
         Serial.println(F("Warning - no Sonos room configured"));
         return;
     }
-    Serial.print(F("Connecting to configured Sonos ")); Serial.println(sonosConfig.sonosRoom);
+    Serial.print(F("Connecting to Sonos room ")); Serial.println(roomName.c_str());
 
-    const uint16_t SONOS_DISCOVER_TIMEOUT_MS = 5000;
-    std::vector<SonosDevice> devices = SonosDiscovery::discover(SONOS_DISCOVER_TIMEOUT_MS);
-
-    // now filter with the following criteria:
-    // a) is at least a device with the given room name joined?
-    //    --> if yes, find the coordinator of that group
-    // b) there could be multiple speaker in the same room (e.g. stereo pair)
-    //    --> if yes, find the coordinator of that room
-    for(SonosDevice sonosDevice : devices) {
-        if (sonosDevice.getRoomName() == configuredRoomName) {
-            if (sonosDevice.isCoordinator()) {
-                setSonosCoordinator(sonosDevice);
-                Serial.print("Found Sonos room coordinator = "); Serial.println(m_sonosCoordinator.getIp());
-                return;
-            }
-            else if (sonosDevice.isJoined()) {
-                std::vector<SonosDevice> zoneDevices = sonosDevice.getZoneGroupState().getSonosDevicesInGroup();
-                for(SonosDevice zoneDevice : zoneDevices) {
-                    if (zoneDevice.isCoordinator()) {
-                        setSonosCoordinator(sonosDevice);
-                        Serial.print("Found Sonos zone coordinator = "); Serial.println(m_sonosCoordinator.getIp());
-                        return;
-                    }
-                }
-            }
-        }
+    const uint16_t SONOS_DISCOVER_TIMEOUT_MS = 1000;
+    SonosDevice coordinator = SonosDiscovery::discoverCoordinator(SONOS_DISCOVER_TIMEOUT_MS, roomName);
+    if (coordinator.isIpValid()) {
+        Serial.print("Found Sonos coordinator = "); Serial.println(m_sonosCoordinator.getIp());
+        setSonosCoordinator(coordinator);
     }
-    Serial.println(F("Warning - unable to connect to configured Sonos room"));
+    else {
+        Serial.print(F("Warning - unable to connect to Sonos room")); Serial.println(roomName.c_str());
+    }
 }
 
 bool DeviceHandler::isSonosConnected(void) const {
