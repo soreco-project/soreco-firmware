@@ -46,7 +46,9 @@ void DeviceStateMachine::runStateMachine(void) {
                 conditionalStep(!m_deviceHandler.isSonosConnected(), State::Sonos_Retry);
                 break;
             case State::Sonos_Retry:
-                m_nextState = State::Sonos_Connecting;
+                conditionalStep(m_deviceHandler.isWifiConnected(), State::Sonos_Connecting);
+                // it could happen that WiFi connection is lost while searching for Sonos speaker
+                conditionalStep(!m_deviceHandler.isWifiConnected(), State::Wifi_Connecting);
                 break;
             case State::Idle:
                 // TODO
