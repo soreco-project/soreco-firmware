@@ -4,10 +4,10 @@
  *************************************************************************************************/
 
 #include <Arduino.h>
-#include "src/SystemInitializeDriver.h"
 #include "src/DebugConsole/DebugConsole.h"
 #include "src/DeviceSettings/DeviceSettings.h"
-#include "src/WifiManager/WifiManager.h"
+#include "src/Wifi/WifiManager.h"
+#include "src/Wifi/Remote/RemoteCommunication.h"
 #include "src/Sonos/SonosDevice.h"
 #include "src/DeviceState/DeviceStateMachine.h"
 
@@ -18,10 +18,13 @@ extern "C" {
 }
 
 const char* FIRMWARE_VERSION = "0.0.1";
+
 DebugConsole debugConsole;
 WifiManager wifiManager;
 SonosDevice sonosDevice;
 DeviceStateMachine deviceStateMachine(wifiManager, sonosDevice);
+RemoteCommunication remoteCommunication(deviceStateMachine.getRemoteHandler());
+
 
 void setup() {
     // // Note: try to use flash strings to reduce RAM usage!
@@ -33,16 +36,16 @@ void setup() {
     Serial.print(F("Available stack: ")); Serial.println(cont_get_free_stack(&g_cont));
     Serial.print(F("Available heap: ")); Serial.println(ESP.getFreeHeap());
 
-    SystemInitializeDriver::initPinConfig();
-
     DeviceSettings::load();
     debugConsole.setup(wifiManager, sonosDevice);
     wifiManager.setup();
     deviceStateMachine.resetStateMachine();
+    remoteCommunication.setup();
 }
 
 void loop() {
     debugConsole.loop();
-    wifiManager.loop(); // TODO move to state machine
     deviceStateMachine.runStateMachine();
+    remoteCommunication.loop();
+    delay(1); // TODO force modem sleep -> verify power consumption
 }

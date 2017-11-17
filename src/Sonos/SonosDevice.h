@@ -53,12 +53,18 @@ public:
     SonosDevice(void);
 
     /**
-     * Constructor with IP address.
+     * Constructor with IP address and unique id.
      */
-    explicit SonosDevice(const IPAddress& ip);
+    explicit SonosDevice(const IPAddress& ip, const std::string& uuid);
+
+    /**
+     * Returns true if the device IP address is valid - false otherwise
+     */
+    bool isIpValid(void);
 
     /**
      * Update destination to the given IP address.
+     * Note: this method will attempt to get the UUID from the device.
      */
     void setIp(const IPAddress& ip);
 
@@ -66,6 +72,12 @@ public:
      * Get the IP address of the sonos device.
      */
     IPAddress getIp(void) const;
+
+    /**
+     * Get the UUID of the sonos device.
+     * Note: if no valid UUID is present, it will attempt to get it from the device.
+     */
+    std::string getUUID(void);
 
     /**
      * Get the play state of the device.
@@ -160,21 +172,24 @@ public:
      * Note: If a speaker is joined with other speakers in the zone, only the group coordinator can perform actions
      * @return True if the speaker is a group coordinator, otherwise False.
      */
-    bool isCoordinator(void) const;
+    bool isCoordinator(void);
 
     /**
      * Check if the speaker is a group coordinator or not.
      * Note: If a speaker is joined with other speakers in the zone, only the group coordinator can perform actions
-     * @param xmlDeviceDescription as XML string (from SonosCommandBuilder::getDeviceDescription() to reduce network traffic)
      * @param sonosZoneInfo (from getZoneGroupState() to reduce network traffic)
      * @return True if the speaker is a group coordinator, otherwise False.
      */
-    static bool isCoordinator(const std::string& xmlDeviceDescription, const SonosZoneInfo& sonosZoneInfo);
+    bool isCoordinator(const SonosZoneInfo& sonosZoneInfo);
 
 private:
 
+    bool isUUIDValid(void);
+    void updateUUID(void);
+
     // instance fields
     IPAddress m_ip;
+    std::string m_uuid;
 };
 
 #endif // SONOSDEVICE_H

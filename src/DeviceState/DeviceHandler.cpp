@@ -1,4 +1,5 @@
 #include "DeviceHandler.h"
+
 #include "../Sonos/SonosDiscovery.h"
 
 DeviceHandler::DeviceHandler(WifiManager& wifiManager, SonosDevice& sonosDevice) :
@@ -10,56 +11,44 @@ DeviceHandler::DeviceHandler(WifiManager& wifiManager, SonosDevice& sonosDevice)
 DeviceHandler::~DeviceHandler(void) {
 }
 
-void DeviceHandler::startWifi(const DeviceSettings::WiFiConfig& wifiConfig) {
-    Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
-    m_wiFiManager.startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
+void DeviceHandler::startWifi() {
+    const DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();    
+    Serial.print(F("Connecting to configured WiFi ")); Serial.println(config.ssid);
+    m_wiFiManager.startClientMode(config.ssid, config.passphrase);
 }
 
 bool DeviceHandler::isWifiConnected(void) const {
     return m_wiFiManager.isWifiConnected();
 }
 
-void DeviceHandler::startHotspot(const DeviceSettings::DeviceParameters& deviceConfig) {
+void DeviceHandler::startHotspot(void) {
+    const DeviceSettings::DeviceParameters deviceParameters = DeviceSettings::getDeviceParameters();
     Serial.println(F("Starting WiFi hotspot for configuration"));
-    m_wiFiManager.startConfigMode(deviceConfig.deviceSerialNumber);
+    m_wiFiManager.startConfigMode(deviceParameters.deviceSerialNumber);
 }
 
-void DeviceHandler::connectToSonos(const DeviceSettings::SonosConfig& sonosConfig) {
-    std::string configuredRoomName(sonosConfig.sonosRoom);
-    if (configuredRoomName.empty()) {
+bool DeviceHandler::isWifiConfigured(void) const {
+    return DeviceSettings::getWiFiConfig().isConfigured();
+}
+
+void DeviceHandler::connectToSonos(void) {
+    const DeviceSettings::SonosConfig sonosConfig = DeviceSettings::getSonosConfig();
+    std::string roomName(sonosConfig.sonosRoom);
+    if (roomName.empty()) {
         Serial.println(F("Warning - no Sonos room configured"));
         return;
     }
-    Serial.print(F("Connecting to configured Sonos ")); Serial.println(sonosConfig.sonosRoom);
+    Serial.print(F("Connecting to Sonos room ")); Serial.println(roomName.c_str());
 
-    const uint16_t SONOS_DISCOVER_TIMEOUT_MS = 5000;
-    std::vector<SonosDevice> devices = SonosDiscovery::discover(SONOS_DISCOVER_TIMEOUT_MS);
-
-    // now filter with the following criteria:
-    // a) is at least a device with the given room name joined?
-    //    --> if yes, find the coordinator of that group
-    // b) there could be multiple speaker in the same room (e.g. stereo pair)
-    //    --> if yes, find the coordinator of that room
-    for(SonosDevice sonosDevice : devices) {
-        if (sonosDevice.getRoomName() == configuredRoomName) {
-            if (sonosDevice.isCoordinator()) {
-                setSonosCoordinator(sonosDevice);
-                Serial.print("Found Sonos room coordinator = "); Serial.println(m_sonosCoordinator.getIp());
-                return;
-            }
-            else if (sonosDevice.isJoined()) {
-                std::vector<SonosDevice> zoneDevices = sonosDevice.getZoneGroupState().getSonosDevicesInGroup();
-                for(SonosDevice zoneDevice : zoneDevices) {
-                    if (zoneDevice.isCoordinator()) {
-                        setSonosCoordinator(sonosDevice);
-                        Serial.print("Found Sonos zone coordinator = "); Serial.println(m_sonosCoordinator.getIp());
-                        return;
-                    }
-                }
-            }
-        }
+    const uint16_t SONOS_DISCOVER_TIMEOUT_MS = 1000;
+    SonosDevice coordinator = SonosDiscovery::discoverCoordinator(SONOS_DISCOVER_TIMEOUT_MS, roomName);
+    if (coordinator.isIpValid()) {
+        Serial.print("Found Sonos coordinator = "); Serial.println(m_sonosCoordinator.getIp());
+        setSonosCoordinator(coordinator);
     }
-    Serial.println(F("Warning - unable to connect to configured Sonos room"));
+    else {
+        Serial.print(F("Warning - unable to connect to Sonos room")); Serial.println(roomName.c_str());
+    }
 }
 
 bool DeviceHandler::isSonosConnected(void) const {
@@ -103,4 +92,8 @@ void DeviceHandler::onEventRestart(void) {
 void DeviceHandler::setSonosCoordinator(SonosDevice& sonosCoordinator) {
     m_sonosCoordinator = sonosCoordinator;
     m_sonosConnected = true;
+}
+
+void DeviceHandler::onEventWifiConfigReceived(void) {
+    // TODO
 }

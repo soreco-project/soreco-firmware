@@ -25,17 +25,29 @@ std::string SonosDevice::PlayState::toString(const PlayState::Id value) {
 SonosDevice::SonosDevice(void) {
 }
 
-SonosDevice::SonosDevice(const IPAddress& ip) :
-    m_ip(ip)
-{
+SonosDevice::SonosDevice(const IPAddress& ip, const std::string& uuid) :
+    m_ip(ip),
+    m_uuid(uuid) {
+}
+
+bool SonosDevice::isIpValid(void) {
+    return m_ip != 0;
 }
 
 void SonosDevice::setIp(const IPAddress& ip) {
     m_ip = ip;
+    updateUUID();
 }
 
 IPAddress SonosDevice::getIp(void) const {
     return m_ip;
+}
+
+std::string SonosDevice::getUUID(void) {
+    if (!isUUIDValid()) {
+        updateUUID();
+    }
+    return m_uuid;
 }
 
 SonosDevice::PlayState::Id SonosDevice::getPlayState(void) const {
@@ -104,12 +116,21 @@ bool SonosDevice::isJoined(const SonosZoneInfo& sonosZoneInfo) {
     return sonosZoneInfo.getZonePlayerUIDInGroup().size() > 1;
 }
 
-bool SonosDevice::isCoordinator(void) const {
-    return isCoordinator(SonosCommandBuilder::getDeviceDescription(m_ip), getZoneGroupState());
+bool SonosDevice::isCoordinator(void) {
+    return isCoordinator(getZoneGroupState());
 }
 
-bool SonosDevice::isCoordinator(const std::string& xmlDeviceDescription, const SonosZoneInfo& sonosZoneInfo) {
-    // If zone have the same UID as the speaker -> speaker is the coordinator of the zone.
-    std::string uid = SonosResponseParser::findOne("<UDN>", "</UDN>", xmlDeviceDescription).substr(strlen("uuid:"));
+bool SonosDevice::isCoordinator(const SonosZoneInfo& sonosZoneInfo) {
+    // If zone starts with the same UUID as the speaker -> speaker is the coordinator of the zone
+    std::string uid = getUUID();
     return sonosZoneInfo.getId().compare(0, uid.length(), uid) == 0;
+}
+
+bool SonosDevice::isUUIDValid(void) {
+    return m_uuid.length() > 0;
+}
+
+void SonosDevice::updateUUID(void) {
+    std::string r = SonosCommandBuilder::getDeviceDescription(m_ip);
+    m_uuid = SonosResponseParser::findOne("<UDN>", "</UDN>", r).substr(strlen("uuid:"));
 }

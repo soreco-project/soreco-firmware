@@ -191,15 +191,15 @@ void cmdSonosDiscover(void) {
 
     for (std::size_t i = 0; i < sonosDevices.size(); i++) {
         IPAddress ip = sonosDevices[i].getIp();
-        // cache the device description and zone info to reduce network traffic
-        const std::string xmlDeviceDescription = SonosCommandBuilder::getDeviceDescription(ip);
+        const std::string uuid = sonosDevices[i].getUUID();
+        const std::string roomName = sonosDevices[i].getRoomName();
+        // cache the zone info to reduce network traffic
         const SonosZoneInfo zoneInfo = sonosDevices[i].getZoneGroupState();
-        const std::string roomName = sonosDevices[i].getRoomName(xmlDeviceDescription);
         const bool isJoined = sonosDevices[i].isJoined(zoneInfo);
-        const bool isCoordinator = sonosDevices[i].isCoordinator(xmlDeviceDescription, zoneInfo);
+        const bool isCoordinator = sonosDevices[i].isCoordinator(zoneInfo);
 
         Serial.print(i + 1); Serial.print(F(": ")); Serial.print(roomName.c_str());
-        Serial.print(F(" (")); Serial.print(ip);
+        Serial.print(F(" (")); Serial.print(ip); Serial.print(F(", ")); Serial.print(uuid.c_str());
         if (isJoined) {
             Serial.print(F(", joined"));
         }

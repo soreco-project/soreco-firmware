@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 #include "../DeviceSettings/DeviceSettings.h"
-#include "../WifiManager/WifiManager.h"
+#include "../Wifi/WifiManager.h"
 #include "../Sonos/SonosDevice.h"
 
 DeviceStateMachine::DeviceStateMachine(WifiManager& wifiManager, SonosDevice& sonosDevice) :
@@ -19,6 +19,10 @@ void DeviceStateMachine::resetStateMachine(void) {
     m_nextState = State::Init;
 }
 
+RemoteEventHandlerIfc& DeviceStateMachine::getRemoteHandler(void) {
+    return m_deviceHandler;
+}
+
 void DeviceStateMachine::runStateMachine(void) {
     bool stateChanged = true;
 
@@ -29,7 +33,8 @@ void DeviceStateMachine::runStateMachine(void) {
         switch (m_currentState) {
             case State::Init:
                 // only enter config mode when there is no stored network in DeviceSettings
-                m_nextState = DeviceSettings::getWiFiConfig().isConfigured() ? State::Wifi_Connecting : State::Hotspot_Starting;
+                conditionalStep(m_deviceHandler.isWifiConfigured(), State::Wifi_Connecting);
+                conditionalStep(!m_deviceHandler.isWifiConfigured(), State::Hotspot_Starting);
                 break;
             case State::Hotspot_Starting:
                 // TODO check is hotspot started
@@ -78,22 +83,16 @@ void DeviceStateMachine::onEnterState(const State::Id state) {
     switch (state) {
         case State::Init:
             break;
-        case State::Hotspot_Starting: {
-                const DeviceSettings::DeviceParameters parameters = DeviceSettings::getDeviceParameters();
-                m_deviceHandler.startHotspot(parameters);
-            }
+        case State::Hotspot_Starting:
+            m_deviceHandler.startHotspot();
             break;
         case State::Hotspot_Idle:
             break;
-        case State::Wifi_Connecting: {
-            const DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();
-            m_deviceHandler.startWifi(config);
-            }
+        case State::Wifi_Connecting:
+            m_deviceHandler.startWifi();
             break;
-        case State::Sonos_Connecting: {
-            const DeviceSettings::SonosConfig config = DeviceSettings::getSonosConfig();
-            m_deviceHandler.connectToSonos(config);
-            }
+        case State::Sonos_Connecting:
+            m_deviceHandler.connectToSonos();
             break;
         case State::Sonos_Retry:
             break;
@@ -119,8 +118,6 @@ void DeviceStateMachine::onRunState(const State::Id state) {
         case State::Sonos_Retry:
             break;
         case State::Idle:
-            // TODO move as a const into SystemInitilizeDriver
-            digitalWrite(2, LOW);
             break;
         default:
             break;
