@@ -25,7 +25,9 @@ std::vector<SonosDevice> SonosZoneInfo::getSonosDevicesInGroup(void) const {
     std::vector<SonosDevice> devices;
     for (std::string uid : m_zonePlayerUIDInGroup) {
         SonosDevice device = SonosDiscovery::discoverByUID(1000, uid);
-        devices.push_back(device);
+        if (device.isIpValid()) {
+            devices.push_back(device);
+        }
     }
     return devices;
 }

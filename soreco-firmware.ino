@@ -45,4 +45,5 @@ void loop() {
     debugConsole.loop();
     wifiManager.loop(); // TODO move to state machine
     deviceStateMachine.runStateMachine();
+    delay(10);
 }
