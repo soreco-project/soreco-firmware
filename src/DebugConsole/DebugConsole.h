@@ -36,7 +36,7 @@ private:
     * Private copy constructor.
     */
     DebugConsole(const DebugConsole&);
-   
+
     /**
     * Private assignment operator.
     */

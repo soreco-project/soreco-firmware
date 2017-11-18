@@ -1,11 +1,17 @@
 # soreco-firmware
 Firmware for soreco Sonos Remote Control.
-soreco is a hardware remote controller for Sonos wireless home sound system, which is currently in development.
+![Hardware Preview](doc/soreco_hardware_preview.jpeg)
 
-[![Build Status](https://travis-ci.org/soreco-project/soreco-firmware.svg?branch=develop)](https://travis-ci.org/soreco-project/soreco-firmware)
+soreco is an open source hardware platform to build a remote controller for Sonos wireless home sound system.
+The system is currently under development.
+
+[![Build Status](https://travis-ci.org/soreco-project/soreco-firmware.svg?branch=develop)](https://travis-ci.org/soreco-project/soreco-firmware) 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/65e64e47425b49ffbc05d3c85264677e)](https://www.codacy.com/app/mguntli/soreco-firmware?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=soreco-project/soreco-firmware&amp;utm_campaign=Badge_Grade)
 
 ## Usage
 Open soreco-firmware.ino in Arduino and flash the NodeMCU 1.0 (ESP-12E Module).
+Note: Requires ESP8266 board package version 2.4.0-rc2.
+https://github.com/esp8266/Arduino#installing-with-boards-manager
 
 The debug console is currently the only way to interact with the device. There are the following commands available to interact with the device:
 * help (list all available commands)
@@ -25,6 +31,12 @@ The debug console is currently the only way to interact with the device. There a
 * Sonos.Connect (set Sonos device to control from debug console)
 * Sonos.PlayState (get / set the play state ('play' | 'pause') of the Sonos device)
 * Power.Mode (set the power mode ('modem', 'light', 'off') if ESP8266)
+
+## Component Overview
+![Device State Machine](doc/Component%20Diagram.png)
+
+## System behavior
+![Device State Machine](doc/Device%20State%20Machine.png)
 
 ## Task List
 [Link to the Trello](https://trello.com/b/eYdj9IFY/firmware)

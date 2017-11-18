@@ -7,7 +7,7 @@
 
 /**
  * Persistent storage of device settings.
- * Built for future extensibility across multiple software updates with layout versioning system. 
+ * Built for future extensibility across multiple software updates with layout versioning system.
  * Note: save() has to be called in order to persist the data
  */
 class DeviceSettings {
@@ -45,10 +45,10 @@ public:
      * Sonos configuration specifically for Sonos which are persistent across reboots.
      */
     struct SonosConfig {
-        // sonos zone to control
-        char sonosZone[32+1] = "";
+        // sonos room to control
+        char sonosRoom[32+1] = "";
     };
-    
+
     /**
      * WiFi configuration contain the connectivity settings which are persistent across reboots.
      */
@@ -95,7 +95,7 @@ public:
             // TODO: better way to be flexible for the future?
             uint8_t actionParameters[64];
         };
-        
+
         char mediaUri[255+1] = "";
         uint8_t numberOfActionsActive;
         Action actions[4];
