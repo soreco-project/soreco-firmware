@@ -19,13 +19,13 @@ bool DeviceHandler::isWifiConnected(void) const {
 }
 
 void DeviceHandler::startWifi(void) {
-    const DeviceSettings::WiFiConfig& wifiConfig = DeviceSettings::getWiFiConfig();
+    const DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
     Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
     m_wiFiManager.startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
 }
 
 void DeviceHandler::startHotspot(void) {
-    const DeviceSettings::DeviceParameters& deviceConfig = DeviceSettings::getDeviceParameters();
+    const DeviceSettings::DeviceParameters deviceConfig = DeviceSettings::getDeviceParameters();
     Serial.println(F("Starting WiFi hotspot for configuration"));
     m_wiFiManager.startConfigMode(deviceConfig.deviceSerialNumber);
 }

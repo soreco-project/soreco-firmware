@@ -7,7 +7,8 @@
 DeviceStateMachine::DeviceStateMachine(WifiManager& wifiManager, SonosDevice& sonosDevice) :
     m_currentState(State::Init),
     m_nextState(State::Init),
-    m_deviceHandler(wifiManager, sonosDevice) {
+    m_deviceHandler(wifiManager, sonosDevice),
+    m_sonosRetryTimestampMs(0) {
 }
 
 DeviceStateMachine::~DeviceStateMachine(void) {
@@ -46,7 +47,11 @@ void DeviceStateMachine::runStateMachine(void) {
                 m_nextState = m_deviceHandler.isSonosConnected() ? State::Idle : State::Sonos_Retry;
                 break;
             case State::Sonos_Retry:
-                m_nextState = m_deviceHandler.isWifiConnected() ? State::Sonos_Connecting : State::Wifi_Connecting;
+                if ((millis() - m_sonosRetryTimestampMs) >= SONOS_RETRY_DELAY_MS) {
+                    // retry timeout expired, let's try again
+                    Serial.println(F("Sonos retry timeout expired - attempt to reconnect"));
+                    m_nextState = m_deviceHandler.isWifiConnected() ? State::Sonos_Connecting : State::Wifi_Connecting;
+                }
                 break;
             case State::Idle:
                 // TODO
@@ -90,6 +95,7 @@ void DeviceStateMachine::onEnterState(const State::Id state) {
             m_deviceHandler.connectToSonos();
             break;
         case State::Sonos_Retry:
+            m_sonosRetryTimestampMs = millis();
             break;
         case State::Idle:
             break;
