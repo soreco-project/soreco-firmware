@@ -39,10 +39,11 @@ bool RemoteCommunication::loop(void) {
             pb_ostream_t streamOut = pb_ostream_from_buffer(buffer, sizeof(buffer));
             builder.payload.Response = ResponseType_OK;
             builder.which_payload = Protocol_Response_tag;
-            bool statusEncode = pb_encode(&streamOut, Protocol_fields, &builder);
-            int builder_length = streamOut.bytes_written;
-            for (int i = 0; i < builder_length; i++) {
-                client.write(buffer[i]);
+            if (pb_encode(&streamOut, Protocol_fields, &builder)) {
+                const int builderLength = streamOut.bytes_written;
+                for (int i = 0; i < builderLength; i++) {
+                    client.write(buffer[i]);
+                }
             }
         }
     }
