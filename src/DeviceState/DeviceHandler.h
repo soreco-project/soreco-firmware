@@ -44,10 +44,11 @@ public:
     void onEventPreset4(void);
     void onEventConfigMode(void);
     void onEventRestart(void);
-
     
     // @see RemoteCommunicationIfc
     virtual void onEventWifiConfigReceived(void);
+    
+    bool isWifiConfigChanged(void);
 private:
     /**
     * Private copy constructor.
@@ -67,6 +68,7 @@ private:
     
     // flags
     bool m_sonosConnected;
+    bool m_wifiConfigEventPending;
 };
 
 #endif //DEVICEHANDLER_H

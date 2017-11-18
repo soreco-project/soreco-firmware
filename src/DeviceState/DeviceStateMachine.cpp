@@ -41,14 +41,15 @@ void DeviceStateMachine::runStateMachine(void) {
                 conditionalStep(true, State::Hotspot_Idle);
                 break;
             case State::Hotspot_Idle:
-                // TODO
+                conditionalStep(m_deviceHandler.isWifiConfigChanged(), State::Init);
                 break;
             case State::Wifi_Connecting:
                 conditionalStep(m_deviceHandler.isWifiConnected(), State::Sonos_Connecting);
                 break;
             case State::Sonos_Connecting:
-                conditionalStep(m_deviceHandler.isSonosConnected(), State::Idle);
-                conditionalStep(!m_deviceHandler.isSonosConnected(), State::Sonos_Retry);
+                conditionalStep(true, State::Idle); // TODO [mguntli] fix it
+                // conditionalStep(m_deviceHandler.isSonosConnected(), State::Idle);
+                // conditionalStep(!m_deviceHandler.isSonosConnected(), State::Sonos_Retry);
                 break;
             case State::Sonos_Retry:
                 conditionalStep(m_deviceHandler.isWifiConnected(), State::Sonos_Connecting);
@@ -56,7 +57,7 @@ void DeviceStateMachine::runStateMachine(void) {
                 conditionalStep(!m_deviceHandler.isWifiConnected(), State::Wifi_Connecting);
                 break;
             case State::Idle:
-                // TODO
+                conditionalStep(m_deviceHandler.isWifiConfigChanged(), State::Init);
                 break;
             default:
                 Serial.println(F("State not implemented! Reset state machine."));
@@ -136,7 +137,7 @@ void DeviceStateMachine::onLeaveState(const State::Id state) {
             break;
         case State::Wifi_Connecting:
             break;
-        case State::Sonos_Connecting:
+       case State::Sonos_Connecting:
             break;
         case State::Sonos_Retry:
             break;

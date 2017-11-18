@@ -5,7 +5,8 @@
 DeviceHandler::DeviceHandler(WifiManager& wifiManager, SonosDevice& sonosDevice) :
     m_wiFiManager(wifiManager),
     m_sonosCoordinator(sonosDevice),
-    m_sonosConnected(false) {
+    m_sonosConnected(false),
+    m_wifiConfigEventPending(false) {
 }
 
 DeviceHandler::~DeviceHandler(void) {
@@ -95,5 +96,16 @@ void DeviceHandler::setSonosCoordinator(SonosDevice& sonosCoordinator) {
 }
 
 void DeviceHandler::onEventWifiConfigReceived(void) {
-    // TODO
+    m_wifiConfigEventPending = true;
+}
+
+bool DeviceHandler::isWifiConfigChanged(void) {
+    if (!m_wifiConfigEventPending) {
+        return false;
+    }
+
+    // reset flag
+    m_wifiConfigEventPending = false;
+
+    return true;
 }
