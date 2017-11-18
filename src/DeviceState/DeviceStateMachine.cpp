@@ -40,7 +40,7 @@ void DeviceStateMachine::runStateMachine(void) {
                 conditionalStep(true, State::Hotspot_Idle);
                 break;
             case State::Hotspot_Idle:
-                conditionalStep(m_deviceHandler.isWifiConfigChanged(), State::Init);
+                conditionalStep(m_deviceHandler.hasWifiConfigChanged(), State::Init);
                 break;
             case State::Wifi_Connecting:
                 if (m_deviceHandler.isWifiConnected()) {
@@ -58,7 +58,7 @@ void DeviceStateMachine::runStateMachine(void) {
                 }
                 break;
             case State::Idle:
-                conditionalStep(m_deviceHandler.isWifiConfigChanged(), State::Init);
+                conditionalStep(m_deviceHandler.hasWifiConfigChanged(), State::Init);
                 break;
             default:
                 Serial.println(F("State not implemented! Reset state machine."));

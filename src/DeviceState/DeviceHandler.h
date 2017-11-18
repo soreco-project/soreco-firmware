@@ -22,13 +22,14 @@ public:
     */
     ~DeviceHandler(void);
 
-    // Wifi events
+    // Wifi
     bool isWifiConfigured(void) const;
     bool isWifiConnected(void) const;
     void startWifi(void);
     void startHotspot(void);
+    bool hasWifiConfigChanged(void);
 
-    // Sonos events
+    // Sonos
     bool isSonosConfigured(void) const;
     bool isSonosConnected(void) const;
     void connectToSonos(void);
@@ -46,11 +47,11 @@ public:
     void onEventConfigMode(void);
     void onEventRestart(void);
     
-    // @see RemoteCommunicationIfc
+    // @see RemoteEventHandlerIfc
     virtual void onEventWifiConfigReceived(void);
     
-    bool isWifiConfigChanged(void);
 private:
+
     /**
     * Private copy constructor.
     */

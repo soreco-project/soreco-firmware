@@ -8,14 +8,13 @@
 #include "Protocol/SorecoProtocol.pb.h"
 #include "RemoteEventHandlerIfc.h"
 
-
 /**
- * Handles communication with remote protocols which are implemented by google nano buffer. 
+ * Handles remote communication with ProtBuf objects (using NanoPB generator for small memory footprint).
  */
 class RemoteCommunication {
 public:
 
-    static const uint16_t PORT = 4000;
+    static const uint16_t REMOTING_PORT = 4000;
     static const uint16_t MAX_PACKAGE_SIZE = 1024;
 
     /**
@@ -50,7 +49,7 @@ private:
      */
     RemoteCommunication& operator=(const RemoteCommunication&);
 
-    _Protocol& processRequest(byte* pData);
+    _Protocol processRequest(byte* pData);
 
     // handlers
     void handleWifiConfig(const WifiConfigMessage& msg);

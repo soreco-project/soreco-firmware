@@ -9,7 +9,7 @@ public:
     /**
      * Destructor.
      */
-	virtual ~RemoteEventHandlerIfc() {
+	virtual ~RemoteEventHandlerIfc(void) {
     }
     
     /**

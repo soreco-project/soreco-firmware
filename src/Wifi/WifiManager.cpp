@@ -3,7 +3,6 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 
-
 const IPAddress localIp(192, 168, 4, 1);
 const IPAddress gateway(192, 168, 4, 1);
 const IPAddress subnet(255, 255, 255, 0);
@@ -30,16 +29,13 @@ void WifiManager::startConfigMode(const uint32_t deviceSerialNumber) {
     // TODO: analyze why is the delay required..
     delay(100);
 
+    // start config hotspot with device serial number as ssid (no password)
     WiFi.mode(WIFI_AP);
-
     char ssid[32+1];
     memcpy(ssid, CONFIG_SSID_PREFIX, strlen(CONFIG_SSID_PREFIX));
     itoa(deviceSerialNumber, &ssid[strlen(CONFIG_SSID_PREFIX)], 10);
-
-    // start config hotspot with device serial number as ssid (no password)
     WiFi.softAPConfig(localIp, gateway, subnet);
     bool success = WiFi.softAP(ssid);
-    // TODO configure WiFi.softAP(ssid, password, channel, hidden) for WPA2-PSK
 
     // TODO: try to not write to serial console within the components
     if (success) {
@@ -63,21 +59,14 @@ void WifiManager::startClientMode(const char* ssid, const char* passphrase) {
     WiFi.begin(ssid, passphrase);
     // wait for connection
     WiFi.waitForConnectResult();
-    
-    // TODO: investigate modem-sleep to reduce power consumption in station mode
 }
 
 std::vector<WifiManager::WiFiNetwork> WifiManager::scanForNetworks(void) {
     std::vector<WiFiNetwork> networkList;
     int networksFound = WiFi.scanNetworks();
     for (int i = 0; i < networksFound; i++) {
-        // convert Arduino String to std::string
-        String ssid = WiFi.SSID(i);
-        char ssidCharBuffer[ssid.length()+1];
-        ssid.toCharArray(ssidCharBuffer, sizeof(ssidCharBuffer));
-
         WiFiNetwork network;
-        network.ssid = ssidCharBuffer;
+        network.ssid = WiFi.SSID(i).c_str();
         network.signalStrength = WiFi.RSSI(i);
         network.encryptionType = (wl_enc_type)WiFi.encryptionType(i);
         networkList.push_back(network);

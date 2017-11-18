@@ -32,6 +32,16 @@ void DeviceHandler::startHotspot(void) {
     m_wiFiManager.startConfigMode(deviceParameters.deviceSerialNumber);
 }
 
+bool DeviceHandler::hasWifiConfigChanged(void) {
+    if (!m_wifiConfigEventPending) {
+        return false;
+    }
+
+    // reset flag
+    m_wifiConfigEventPending = false;
+    return true;
+}
+
 bool DeviceHandler::isSonosConfigured(void) const {
     return DeviceSettings::getSonosConfig().isConfigured();
 }
@@ -101,15 +111,4 @@ void DeviceHandler::setSonosCoordinator(SonosDevice& sonosCoordinator) {
 
 void DeviceHandler::onEventWifiConfigReceived(void) {
     m_wifiConfigEventPending = true;
-}
-
-bool DeviceHandler::isWifiConfigChanged(void) {
-    if (!m_wifiConfigEventPending) {
-        return false;
-    }
-
-    // reset flag
-    m_wifiConfigEventPending = false;
-
-    return true;
 }
