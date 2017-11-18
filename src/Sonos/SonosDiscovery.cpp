@@ -9,7 +9,7 @@ std::vector<SonosDevice> SonosDiscovery::discover(const uint16_t timeoutMs) {
     unsigned long startTimeMs = millis();
     while ((millis() - startTimeMs) < timeoutMs) {
         processResponse(udpClient, deviceList);
-        delay(50);
+        delay(10);
     }
     return deviceList;
 }
@@ -26,9 +26,10 @@ SonosDevice SonosDiscovery::discoverByUID(const uint16_t timeoutMs, const std::s
             // the device responded, immediatly return
             return deviceList[0];
         }
-        delay(50);
+        delay(10);
     }
     // TODO: better error handling when no device found
+    Serial.println("WARNING! SonosDiscovery - discoverbyUID failed!");
     return SonosDevice();
 }
 
@@ -91,14 +92,20 @@ bool SonosDiscovery::processResponse(WiFiUDP& udpClient, std::vector<SonosDevice
         if (bytesRead > 0) {
             // force null termination
             buffer[bytesRead] = 0;
+            
+            std::string uuidSearchToken = "USN: uuid:";
             std::string response(buffer);
-            std::size_t uuidStartPos = response.find("uuid:");
-            std::size_t uuidEndPos = response.find("::urn:schemas-upnp-org:device:ZonePlayer:1");
-
+            std::size_t uuidStartPos = response.find(uuidSearchToken);
+            std::size_t uuidEndPos = response.find('\r', uuidStartPos);
             if ((uuidStartPos != std::string::npos) && (uuidEndPos != std::string::npos)) {
-                // it's actually a Sonos device and it's safe to read the uuid
-                uuidStartPos += 5; // advance start pointer by length of "uuid:"
+                // Response if discovered by UID = USN: uuid:RINCON_****
+                // Response if discovered by Service = USN: uuid:RINCON_****::urn:schemas-upnp-org:device:ZonePlayer:1
+                uuidStartPos += uuidSearchToken.length();
                 std::string uuid = response.substr(uuidStartPos, uuidEndPos - uuidStartPos);
+                std::size_t serviceDescriptionPos = uuid.find("::urn:schemas-upnp-org:device:ZonePlayer:1");
+                if (serviceDescriptionPos != std::string::npos) {
+                    uuid = uuid.substr(0, serviceDescriptionPos);
+                }
                 SonosDevice sonosDevice(udpClient.remoteIP(), uuid);
 
                 // TODO: for a unknown reason we get sporadically multiple responses from the same device
