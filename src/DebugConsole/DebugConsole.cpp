@@ -1,11 +1,7 @@
 #include "DebugConsole.h"
 
 #include <Arduino.h>
-<<<<<<< HEAD
-
-=======
 #include <string.h>
->>>>>>> develop
 #include "SerialCommands.h"
 #include "../DeviceSettings/DeviceSettings.h"
 #include "../Sonos/SonosDiscovery.h"
@@ -251,7 +247,6 @@ void cmdSonosPlayState(void) {
     }
 }
 
-<<<<<<< HEAD
 // See https://www.espressif.com/sites/default/files/9b-esp8266-low_power_solutions_en_0.pdf for more information
 void cmdPowerMode(void) {
     char* argument = serialCommands.getArgument();
@@ -287,7 +282,9 @@ void cmdPowerMode(void) {
         }
     } else {
         Serial.println(F("Argument required"));
-=======
+    }
+}
+
 void cmdSonosVolume(void) {
     const char* argument = serialCommands.getArgument();
     if (argument == NULL) {
@@ -298,7 +295,6 @@ void cmdSonosVolume(void) {
         // set
         int volume = atoi(argument);
         pSonosDevice->setVolume(volume);
->>>>>>> develop
     }
 }
 
@@ -328,11 +324,8 @@ void DebugConsole::setup(WifiManager& wifiManager, SonosDevice& sonosDevice) {
     serialCommands.addCommand("Sonos.Discover", cmdSonosDiscover);
     serialCommands.addCommand("Sonos.Connect", cmdSonosConnect);
     serialCommands.addCommand("Sonos.PlayState", cmdSonosPlayState);
-<<<<<<< HEAD
-    serialCommands.addCommand("Power.Mode", cmdPowerMode);
-=======
     serialCommands.addCommand("Sonos.Volume", cmdSonosVolume);
->>>>>>> develop
+    serialCommands.addCommand("Power.Mode", cmdPowerMode);
 }
 
 void DebugConsole::loop(void) {
