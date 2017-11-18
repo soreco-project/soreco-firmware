@@ -10,21 +10,32 @@ DeviceHandler::DeviceHandler(WifiManager& wifiManager, SonosDevice& sonosDevice)
 DeviceHandler::~DeviceHandler(void) {
 }
 
-void DeviceHandler::startWifi(const DeviceSettings::WiFiConfig& wifiConfig) {
-    Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
-    m_wiFiManager.startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
+bool DeviceHandler::isWifiConfigured(void) const {
+    return DeviceSettings::getWiFiConfig().isConfigured();
 }
 
 bool DeviceHandler::isWifiConnected(void) const {
     return m_wiFiManager.isWifiConnected();
 }
 
-void DeviceHandler::startHotspot(const DeviceSettings::DeviceParameters& deviceConfig) {
+void DeviceHandler::startWifi(void) {
+    const DeviceSettings::WiFiConfig& wifiConfig = DeviceSettings::getWiFiConfig();
+    Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
+    m_wiFiManager.startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
+}
+
+void DeviceHandler::startHotspot(void) {
+    const DeviceSettings::DeviceParameters& deviceConfig = DeviceSettings::getDeviceParameters();
     Serial.println(F("Starting WiFi hotspot for configuration"));
     m_wiFiManager.startConfigMode(deviceConfig.deviceSerialNumber);
 }
 
-void DeviceHandler::connectToSonos(const DeviceSettings::SonosConfig& sonosConfig) {
+bool DeviceHandler::isSonosConfigured(void) const {
+    return DeviceSettings::getSonosConfig().isConfigured();
+}
+
+void DeviceHandler::connectToSonos(void) {
+    const DeviceSettings::SonosConfig sonosConfig = DeviceSettings::getSonosConfig();
     std::string roomName(sonosConfig.sonosRoom);
     if (roomName.empty()) {
         Serial.println(F("Warning - no Sonos room configured"));

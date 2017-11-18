@@ -22,13 +22,15 @@ public:
     ~DeviceHandler(void);
 
     // Wifi events
-    void startWifi(const DeviceSettings::WiFiConfig& wifiConfig);
+    bool isWifiConfigured(void) const;
     bool isWifiConnected(void) const;
-    void startHotspot(const DeviceSettings::DeviceParameters& deviceConfig);
+    void startWifi(void);
+    void startHotspot(void);
 
     // Sonos events
-    void connectToSonos(const DeviceSettings::SonosConfig& sonosConfig);
+    bool isSonosConfigured(void) const;
     bool isSonosConnected(void) const;
+    void connectToSonos(void);
 
     // input event handlers
     void onEventVolumeUp(uint16_t volumeStepCount);

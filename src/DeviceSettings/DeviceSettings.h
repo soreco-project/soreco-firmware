@@ -47,6 +47,10 @@ public:
     struct SonosConfig {
         // sonos room to control
         char sonosRoom[32+1] = "";
+
+        bool isConfigured(void) {
+            return strlen(sonosRoom) > 0;
+        }
     };
 
     /**
