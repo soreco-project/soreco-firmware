@@ -27,13 +27,9 @@ void DeviceHandler::startWifi(void) {
 }
 
 void DeviceHandler::startHotspot(void) {
-    const DeviceSettings::DeviceParameters deviceConfig = DeviceSettings::getDeviceParameters();
+    const DeviceSettings::DeviceParameters deviceParameters = DeviceSettings::getDeviceParameters();
     Serial.println(F("Starting WiFi hotspot for configuration"));
     m_wiFiManager.startConfigMode(deviceParameters.deviceSerialNumber);
-}
-
-bool DeviceHandler::isWifiConfigured(void) const {
-    return DeviceSettings::getWiFiConfig().isConfigured();
 }
 
 bool DeviceHandler::isSonosConfigured(void) const {
