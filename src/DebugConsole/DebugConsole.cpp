@@ -1,7 +1,6 @@
 #include "DebugConsole.h"
 
 #include <Arduino.h>
-#include <string.h>
 #include "SerialCommands.h"
 #include "../DeviceSettings/DeviceSettings.h"
 #include "../Sonos/SonosDiscovery.h"
@@ -247,11 +246,12 @@ void cmdSonosPlayState(void) {
     }
 }
 
-// See https://www.espressif.com/sites/default/files/9b-esp8266-low_power_solutions_en_0.pdf for more information
+// See https://www.espressif.com/sites/default/files/9b-esp8266-low_power_solutions_en_0.pdf for more information.
+// For testing purpose
 void cmdPowerMode(void) {
     char* argument = serialCommands.getArgument();
     if (argument != NULL) {
-        if (stricmp(argument, "modem") == 0) { // disable only Wifi chip
+        if (strcasecmp(argument, "modem") == 0) { // disable only Wifi chip
             Serial.println(F("Wifi modem sleep"));
             WiFi.disconnect();
 
@@ -262,7 +262,7 @@ void cmdPowerMode(void) {
 
             delay(100); //For some reason the modem won't go to sleep unless you do a delay
         } 
-        else if (stricmp(argument, "light") == 0) { // disable cpu and wifi chip, wakeup by GPIO
+        else if (strcasecmp(argument, "light") == 0) { // disable cpu and wifi chip, wakeup by GPIO
             Serial.println(F("Wifi light sleep"));
 
             wifi_set_opmode(NULL_MODE);
@@ -273,7 +273,7 @@ void cmdPowerMode(void) {
 
             delay(100); //For some reason the modem won't go to sleep unless you do a delay
         } 
-        else if (stricmp(argument, "off") == 0) {
+        else if (strcasecmp(argument, "off") == 0) {
             Serial.println(F("Wifi station mode"));
 
             wifi_fpm_close();
