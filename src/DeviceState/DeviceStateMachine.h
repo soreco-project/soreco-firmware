@@ -70,9 +70,12 @@ private:
      */
     void conditionalStep(const bool isValid, const State::Id state);
 
+    const uint16_t SONOS_RETRY_DELAY_MS = 5000;
+
     State::Id m_currentState;
     State::Id m_nextState;
     DeviceHandler m_deviceHandler;
+    unsigned long m_sonosRetryTimestampMs;
 };
 
 #endif //DEVICESTATEMACHINE_H

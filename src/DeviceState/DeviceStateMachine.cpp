@@ -1,14 +1,14 @@
 #include "DeviceStateMachine.h"
 
 #include <Arduino.h>
-#include "../DeviceSettings/DeviceSettings.h"
 #include "../Wifi/WifiManager.h"
 #include "../Sonos/SonosDevice.h"
 
 DeviceStateMachine::DeviceStateMachine(WifiManager& wifiManager, SonosDevice& sonosDevice) :
     m_currentState(State::Init),
     m_nextState(State::Init),
-    m_deviceHandler(wifiManager, sonosDevice) {
+    m_deviceHandler(wifiManager, sonosDevice),
+    m_sonosRetryTimestampMs(0) {
 }
 
 DeviceStateMachine::~DeviceStateMachine(void) {
@@ -32,9 +32,8 @@ void DeviceStateMachine::runStateMachine(void) {
 
         switch (m_currentState) {
             case State::Init:
-                // only enter config mode when there is no stored network in DeviceSettings
-                conditionalStep(m_deviceHandler.isWifiConfigured(), State::Wifi_Connecting);
-                conditionalStep(!m_deviceHandler.isWifiConfigured(), State::Hotspot_Starting);
+                // only enter config mode when there is no stored network
+                m_nextState = m_deviceHandler.isWifiConfigured() ? State::Wifi_Connecting : State::Hotspot_Starting;
                 break;
             case State::Hotspot_Starting:
                 // TODO check is hotspot started
@@ -44,17 +43,19 @@ void DeviceStateMachine::runStateMachine(void) {
                 conditionalStep(m_deviceHandler.isWifiConfigChanged(), State::Init);
                 break;
             case State::Wifi_Connecting:
-                conditionalStep(m_deviceHandler.isWifiConnected(), State::Sonos_Connecting);
+                if (m_deviceHandler.isWifiConnected()) {
+                    m_nextState = m_deviceHandler.isSonosConfigured() ? State::Sonos_Connecting : State::Idle;
+                }
                 break;
             case State::Sonos_Connecting:
-                conditionalStep(true, State::Idle); // TODO [mguntli] fix it
-                // conditionalStep(m_deviceHandler.isSonosConnected(), State::Idle);
-                // conditionalStep(!m_deviceHandler.isSonosConnected(), State::Sonos_Retry);
+                m_nextState = m_deviceHandler.isSonosConnected() ? State::Idle : State::Sonos_Retry;
                 break;
             case State::Sonos_Retry:
-                conditionalStep(m_deviceHandler.isWifiConnected(), State::Sonos_Connecting);
-                // it could happen that WiFi connection is lost while searching for Sonos speaker
-                conditionalStep(!m_deviceHandler.isWifiConnected(), State::Wifi_Connecting);
+                if ((millis() - m_sonosRetryTimestampMs) >= SONOS_RETRY_DELAY_MS) {
+                    // retry timeout expired, let's try again
+                    Serial.println(F("Sonos retry timeout expired - attempt to reconnect"));
+                    m_nextState = m_deviceHandler.isWifiConnected() ? State::Sonos_Connecting : State::Wifi_Connecting;
+                }
                 break;
             case State::Idle:
                 conditionalStep(m_deviceHandler.isWifiConfigChanged(), State::Init);
@@ -98,6 +99,7 @@ void DeviceStateMachine::onEnterState(const State::Id state) {
             m_deviceHandler.connectToSonos();
             break;
         case State::Sonos_Retry:
+            m_sonosRetryTimestampMs = millis();
             break;
         case State::Idle:
             break;

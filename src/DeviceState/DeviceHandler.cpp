@@ -12,24 +12,37 @@ DeviceHandler::DeviceHandler(WifiManager& wifiManager, SonosDevice& sonosDevice)
 DeviceHandler::~DeviceHandler(void) {
 }
 
-void DeviceHandler::startWifi() {
-    const DeviceSettings::WiFiConfig config = DeviceSettings::getWiFiConfig();    
-    Serial.print(F("Connecting to configured WiFi ")); Serial.println(config.ssid);
-    m_wiFiManager.startClientMode(config.ssid, config.passphrase);
+bool DeviceHandler::isWifiConfigured(void) const {
+    return DeviceSettings::getWiFiConfig().isConfigured();
 }
 
 bool DeviceHandler::isWifiConnected(void) const {
     return m_wiFiManager.isWifiConnected();
 }
 
+void DeviceHandler::startWifi(void) {
+    const DeviceSettings::WiFiConfig wifiConfig = DeviceSettings::getWiFiConfig();
+    Serial.print(F("Connecting to configured WiFi ")); Serial.println(wifiConfig.ssid);
+    m_wiFiManager.startClientMode(wifiConfig.ssid, wifiConfig.passphrase);
+}
+
 void DeviceHandler::startHotspot(void) {
-    const DeviceSettings::DeviceParameters deviceParameters = DeviceSettings::getDeviceParameters();
+    const DeviceSettings::DeviceParameters deviceConfig = DeviceSettings::getDeviceParameters();
     Serial.println(F("Starting WiFi hotspot for configuration"));
     m_wiFiManager.startConfigMode(deviceParameters.deviceSerialNumber);
 }
 
 bool DeviceHandler::isWifiConfigured(void) const {
     return DeviceSettings::getWiFiConfig().isConfigured();
+}
+
+bool DeviceHandler::isSonosConfigured(void) const {
+    return DeviceSettings::getSonosConfig().isConfigured();
+}
+
+bool DeviceHandler::isSonosConnected(void) const {
+    // TODO: check connection to Sonos (or return true if no room configured)
+    return m_sonosConnected;
 }
 
 void DeviceHandler::connectToSonos(void) {
@@ -50,11 +63,6 @@ void DeviceHandler::connectToSonos(void) {
     else {
         Serial.print(F("Warning - unable to connect to Sonos room ")); Serial.println(roomName.c_str());
     }
-}
-
-bool DeviceHandler::isSonosConnected(void) const {
-    // TODO: check connection to Sonos (or return true if no room configured)
-    return m_sonosConnected;
 }
 
 void DeviceHandler::onEventVolumeUp(uint16_t volumeStepCount) {

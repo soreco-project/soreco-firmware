@@ -29,7 +29,7 @@ SonosDevice SonosDiscovery::discoverByUID(const uint16_t timeoutMs, const std::s
         delay(10);
     }
     // TODO: better error handling when no device found
-    Serial.println("WARNING! SonosDiscovery - discoverbyUID failed!");
+    Serial.println("WARNING! SonosDiscovery - discoverByUID failed!");
     return SonosDevice();
 }
 

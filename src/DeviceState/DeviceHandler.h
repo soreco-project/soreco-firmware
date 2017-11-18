@@ -23,14 +23,15 @@ public:
     ~DeviceHandler(void);
 
     // Wifi events
-    void startWifi(void);
-    bool isWifiConnected(void) const;
-    void startHotspot(void);
     bool isWifiConfigured(void) const;
+    bool isWifiConnected(void) const;
+    void startWifi(void);
+    void startHotspot(void);
 
     // Sonos events
-    void connectToSonos(void);
+    bool isSonosConfigured(void) const;
     bool isSonosConnected(void) const;
+    void connectToSonos(void);
 
     // input event handlers TODO extract to InputEventIfc
     void onEventVolumeUp(uint16_t volumeStepCount);
