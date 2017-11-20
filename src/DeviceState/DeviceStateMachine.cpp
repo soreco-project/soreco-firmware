@@ -1,7 +1,7 @@
 #include "DeviceStateMachine.h"
 
 #include <Arduino.h>
-#include "../WifiManager/WifiManager.h"
+#include "../Wifi/WifiManager.h"
 #include "../Sonos/SonosDevice.h"
 
 DeviceStateMachine::DeviceStateMachine(WifiManager& wifiManager, SonosDevice& sonosDevice) :
@@ -17,6 +17,10 @@ DeviceStateMachine::~DeviceStateMachine(void) {
 void DeviceStateMachine::resetStateMachine(void) {
     m_currentState = State::Init;
     m_nextState = State::Init;
+}
+
+RemoteEventHandlerIfc& DeviceStateMachine::getRemoteHandler(void) {
+    return m_deviceHandler;
 }
 
 void DeviceStateMachine::runStateMachine(void) {
@@ -36,7 +40,7 @@ void DeviceStateMachine::runStateMachine(void) {
                 conditionalStep(true, State::Hotspot_Idle);
                 break;
             case State::Hotspot_Idle:
-                // TODO
+                conditionalStep(m_deviceHandler.hasWifiConfigChanged(), State::Init);
                 break;
             case State::Wifi_Connecting:
                 if (m_deviceHandler.isWifiConnected()) {
@@ -54,7 +58,7 @@ void DeviceStateMachine::runStateMachine(void) {
                 }
                 break;
             case State::Idle:
-                // TODO
+                conditionalStep(m_deviceHandler.hasWifiConfigChanged(), State::Init);
                 break;
             default:
                 Serial.println(F("State not implemented! Reset state machine."));
@@ -119,8 +123,6 @@ void DeviceStateMachine::onRunState(const State::Id state) {
         case State::Sonos_Retry:
             break;
         case State::Idle:
-            // TODO move as a const into SystemInitilizeDriver
-            digitalWrite(2, LOW);
             break;
         default:
             break;
@@ -137,7 +139,7 @@ void DeviceStateMachine::onLeaveState(const State::Id state) {
             break;
         case State::Wifi_Connecting:
             break;
-        case State::Sonos_Connecting:
+       case State::Sonos_Connecting:
             break;
         case State::Sonos_Retry:
             break;

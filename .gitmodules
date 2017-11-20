@@ -1,0 +1,4 @@
+[submodule "proto/soreco-protocol"]
+	path = proto/soreco-protocol
+	url = https://github.com/soreco-project/soreco-protocol.git
+	branch = develop

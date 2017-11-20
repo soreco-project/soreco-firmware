@@ -13,6 +13,16 @@ Open soreco-firmware.ino in Arduino and flash the NodeMCU 1.0 (or any other ESP-
 Note: Requires ESP8266 board package version 2.4.0-rc2.
 https://github.com/esp8266/Arduino#installing-with-boards-manager
 
+### Initializing Submodules
+The project uses soreco-protocol.
+To enable soreco-protocol locally you need to initialize repository submodules.
+Run the following command in the checkout directory to do so.
+ 
+```bash
+git submodule update --init --remote
+```
+
+### Console Commands
 The debug console is currently the only way to interact with the device. There are the following commands available to interact with the device:
 * help (list all available commands)
 * Config.Save (save configuration to persistent storage)

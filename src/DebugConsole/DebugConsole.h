@@ -1,7 +1,7 @@
 #ifndef DEBUGCONSOLE_H
 #define DEBUGCONSOLE_H
 
-#include "../WifiManager/WifiManager.h"
+#include "../Wifi/WifiManager.h"
 #include "../Sonos/SonosDevice.h"
 
 /**

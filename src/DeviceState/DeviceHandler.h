@@ -2,14 +2,15 @@
 #define DEVICEHANDLER_H
 
 #include <stdint.h>
-#include "../WifiManager/WifiManager.h"
+#include "../Wifi/WifiManager.h"
+#include "../Wifi/Remote/RemoteEventHandlerIfc.h"
 #include "../Sonos/SonosDevice.h"
 #include "../DeviceSettings/DeviceSettings.h"
 
 /**
  * Handler for state machine events
  */
-class DeviceHandler {
+class DeviceHandler : public RemoteEventHandlerIfc {
 public:
     /**
     * Default constructor.
@@ -21,18 +22,19 @@ public:
     */
     ~DeviceHandler(void);
 
-    // Wifi events
+    // Wifi
     bool isWifiConfigured(void) const;
     bool isWifiConnected(void) const;
     void startWifi(void);
     void startHotspot(void);
+    bool hasWifiConfigChanged(void);
 
-    // Sonos events
+    // Sonos
     bool isSonosConfigured(void) const;
     bool isSonosConnected(void) const;
     void connectToSonos(void);
 
-    // input event handlers
+    // input event handlers TODO extract to InputEventIfc
     void onEventVolumeUp(uint16_t volumeStepCount);
     void onEventVolumeDown(uint16_t volumeStepCount);
     void onEventPlayPause(void);
@@ -44,8 +46,12 @@ public:
     void onEventPreset4(void);
     void onEventConfigMode(void);
     void onEventRestart(void);
-
+    
+    // @see RemoteEventHandlerIfc
+    virtual void onEventWifiConfigReceived(void);
+    
 private:
+
     /**
     * Private copy constructor.
     */
@@ -58,9 +64,13 @@ private:
 
     void setSonosCoordinator(SonosDevice& sonosCoordinator);
 
+    // components
     WifiManager& m_wiFiManager;
     SonosDevice& m_sonosCoordinator;
+    
+    // flags
     bool m_sonosConnected;
+    bool m_wifiConfigEventPending;
 };
 
 #endif //DEVICEHANDLER_H

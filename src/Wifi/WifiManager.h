@@ -18,7 +18,6 @@ public:
         wl_enc_type encryptionType;
     };
 
-    static const uint16_t PORT = 4000;
     const char* CONFIG_SSID_PREFIX = "soreco-";
 
     /**
@@ -35,11 +34,6 @@ public:
      * Setup the current WiFi manager
      */
     void setup(void);
-
-    /**
-     * handle TCP. TODO do it with irq!
-     */
-    void loop(void);
 
     /**
      * Set system into hotspot (access point) mode so an external device can connect for configuration.
@@ -72,8 +66,6 @@ private:
      * Private assignment operator.
      */
     WifiManager& operator=(const WifiManager&);
-
-    WiFiServer m_server;
 };
 
 #endif //WIFIMANAGER_H

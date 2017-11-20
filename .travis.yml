@@ -15,8 +15,6 @@ before_install:
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
 
 install:
-  # cppcheck
-  - sudo apt-get install -qq cppcheck
   # Arduino
   - ln -s $PWD /usr/local/share/arduino/libraries/
   - arduino --pref "boardsmanager.additional.urls=https://github.com/esp8266/Arduino/releases/download/2.4.0-rc2/package_esp8266com_index.json" --save-prefs
@@ -29,8 +27,6 @@ install:
 script:
   # Arduino compilation
   - arduino --verify --board $BD $PWD/soreco-firmware.ino
-  # cppcheck static code analysis
-  - cppcheck src --quiet --error-exitcode=1
 
 notifications:
   email:

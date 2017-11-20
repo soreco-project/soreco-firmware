@@ -30,6 +30,10 @@ public:
      */
     void resetStateMachine(void);
 
+    /**
+     * Returns the device handler
+     */
+    RemoteEventHandlerIfc& getRemoteHandler(void);
 private:
 
     /**
