@@ -56,7 +56,7 @@ bool RemoteCommunication::loop(void) {
 _Protocol RemoteCommunication::processRequest(byte* pData) {
     _Protocol builder = Protocol_init_zero;
     pb_istream_t streamIn = pb_istream_from_buffer(pData, WifiConfigMessage_size);
-    bool statusDecode = pb_decode(&streamIn, Protocol_fields, &builder);
+    pb_decode(&streamIn, Protocol_fields, &builder);
 
     return builder;
 }
