@@ -9,12 +9,15 @@ The system is currently under development.
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/65e64e47425b49ffbc05d3c85264677e)](https://www.codacy.com/app/mguntli/soreco-firmware?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=soreco-project/soreco-firmware&amp;utm_campaign=Badge_Grade)
 
 ## Usage
-Open soreco-firmware.ino in Arduino and flash the NodeMCU 1.0 (or any other ESP-12E Module).
+Open soreco-firmware.ino in Arduino and flash the NodeMCU 1.0 (or any other ESP-12E Module). 
+
+Interact with the device through the debug console with 115'200bps.
+
 Note: Requires ESP8266 board package version 2.4.0-rc2.
 https://github.com/esp8266/Arduino#installing-with-boards-manager
 
 ### Initializing Submodules
-The project uses soreco-protocol.
+The project uses soreco-protocol to communicate with the smartphone app (soreco-android).
 To enable soreco-protocol locally you need to initialize repository submodules.
 Run the following command in the checkout directory to do so.
  
@@ -41,9 +44,6 @@ The debug console is currently the only way to interact with the device. There a
 * Sonos.Connect (set Sonos device to control from debug console)
 * Sonos.PlayState (get / set the play state ('play' | 'pause') of the Sonos device)
 * Power.Mode (set the power mode ('modem' | 'light' | 'off') of ESP8266)
-
-## Component Overview
-![Device State Machine](doc/Component%20Diagram.png)
 
 ## System behavior
 ![Device State Machine](doc/Device%20State%20Machine.png)
