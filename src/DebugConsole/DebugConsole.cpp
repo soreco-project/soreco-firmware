@@ -10,9 +10,6 @@ extern "C" {
     #include "user_interface.h"
 }
 
-// Note: try to use flash strings to reduce RAM usage!
-// https://espressif.com/sites/default/files/documentation/save_esp8266ex_ram_with_progmem_en.pdf
-
 SerialCommands serialCommands;
 // workaround to have access from non-member functions to components
 WifiManager* pWiFiManager = NULL;
@@ -246,6 +243,26 @@ void cmdSonosPlayState(void) {
     }
 }
 
+void cmdSonosVolume(void) {
+    const char* argument = serialCommands.getArgument();
+    if (argument == NULL) {
+        // get
+        Serial.print(F("Sonos volume = ")); Serial.println(pSonosDevice->getVolume());
+    }
+    else {
+        // set
+        int volume = constrain(atoi(argument), 0, 100);
+        pSonosDevice->setVolume(volume);
+    }
+}
+
+void cmdSonosPlayUri(void) {
+    const char* argument = serialCommands.getArgument();
+    if (argument != NULL) {
+        pSonosDevice->playUri(argument, "");
+    }
+}
+
 // See https://www.espressif.com/sites/default/files/9b-esp8266-low_power_solutions_en_0.pdf for more information.
 // For testing purpose
 void cmdPowerMode(void) {
@@ -285,19 +302,6 @@ void cmdPowerMode(void) {
     }
 }
 
-void cmdSonosVolume(void) {
-    const char* argument = serialCommands.getArgument();
-    if (argument == NULL) {
-        // get
-        Serial.print(F("Sonos volume = ")); Serial.println(pSonosDevice->getVolume());
-    }
-    else {
-        // set
-        int volume = atoi(argument);
-        pSonosDevice->setVolume(volume);
-    }
-}
-
 DebugConsole::DebugConsole(void) {
 }
 
@@ -325,6 +329,7 @@ void DebugConsole::setup(WifiManager& wifiManager, SonosDevice& sonosDevice) {
     serialCommands.addCommand("Sonos.Connect", cmdSonosConnect);
     serialCommands.addCommand("Sonos.PlayState", cmdSonosPlayState);
     serialCommands.addCommand("Sonos.Volume", cmdSonosVolume);
+    serialCommands.addCommand("Sonos.PlayUri", cmdSonosPlayUri);
     serialCommands.addCommand("Power.Mode", cmdPowerMode);
 }
 
