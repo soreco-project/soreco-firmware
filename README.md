@@ -13,7 +13,7 @@ Open soreco-firmware.ino in Arduino and flash the NodeMCU 1.0 (or any other ESP-
 
 Interact with the device through the debug console with 115'200bps.
 
-Note: Requires ESP8266 board package version 2.4.0-rc2.
+Note: Requires ESP8266 at least board package version 2.4.0-rc2.
 https://github.com/esp8266/Arduino#installing-with-boards-manager
 
 ### Initializing Submodules
@@ -43,6 +43,7 @@ The debug console is currently the only way to interact with the device. There a
 * Sonos.Discover (scan and report all available Sonos devices)
 * Sonos.Connect (set Sonos device to control from debug console)
 * Sonos.PlayState (get / set the play state ('play' | 'pause') of the Sonos device)
+* Sonos.Volume (get / set the volume of the Sonos device)
 * Power.Mode (set the power mode ('modem' | 'light' | 'off') of ESP8266)
 
 ## System behavior
