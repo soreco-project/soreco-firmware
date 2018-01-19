@@ -44,6 +44,7 @@ The debug console is currently the only way to interact with the device. There a
 * Sonos.Connect (set Sonos device to control from debug console)
 * Sonos.PlayState (get / set the play state ('play' | 'pause') of the Sonos device)
 * Sonos.Volume (get / set the volume of the Sonos device)
+* Sonos.PlayUri 'uri' (for example: x-rincon-mp3radio://www.radioswisspop.ch/live/aacp.m3u)
 * Power.Mode (set the power mode ('modem' | 'light' | 'off') of ESP8266)
 
 ## System behavior
