@@ -13,7 +13,7 @@ Open soreco-firmware.ino in Arduino and flash the NodeMCU 1.0 (or any other ESP-
 
 Interact with the device through the debug console with 115'200bps.
 
-Note: Requires ESP8266 at least board package version 2.4.0-rc2.
+Note: Requires ESP8266 at least board package version 2.4.0.
 https://github.com/esp8266/Arduino#installing-with-boards-manager
 
 ### Initializing Submodules
