@@ -35,7 +35,7 @@ void WifiManager::startConfigMode(const uint32_t deviceSerialNumber) {
     memcpy(ssid, CONFIG_SSID_PREFIX, strlen(CONFIG_SSID_PREFIX));
     itoa(deviceSerialNumber, &ssid[strlen(CONFIG_SSID_PREFIX)], 10);
     WiFi.softAPConfig(localIp, gateway, subnet);
-    bool success = WiFi.softAP(ssid);
+    bool success = WiFi.softAP(ssid, CONFIG_PW, CONFIG_CHANNEL, CONFIG_HIDDEN);
 
     // TODO: try to not write to serial console within the components
     if (success) {

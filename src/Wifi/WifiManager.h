@@ -18,7 +18,11 @@ public:
         wl_enc_type encryptionType;
     };
 
+    // be sure that these consts are matches with the app
     const char* CONFIG_SSID_PREFIX = "soreco-";
+    const char* CONFIG_PW = "abcd1234";
+    const uint8_t CONFIG_CHANNEL = 1; 
+    const boolean CONFIG_HIDDEN = false;
 
     /**
      * Default constructor.
